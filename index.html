@@ -704,6 +704,10 @@ body.inYokai #stageBg{opacity:0}
 .achPop.on{transform:translate(-50%,0);opacity:1}
 .achPop .achIc{flex:none;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:var(--gold);border:1.5px solid var(--gold);box-shadow:inset 0 0 0 3px rgba(0,0,0,.3),inset 0 0 0 4px color-mix(in srgb,var(--gold) 40%,transparent)}
 .achPop small{display:block;font-size:11px;letter-spacing:.08em;color:var(--gold)}.achPop b{display:block;font-size:17px;color:var(--ink)}.achPop span{display:block;font-size:12px;color:var(--dim)}
+.rotLock{display:none}
+@media (orientation:landscape) and (max-height:520px) and (pointer:coarse){.rotLock{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;align-content:center;gap:14px;background:#161311;color:var(--ink,#f2ece4);text-align:center;font-size:16px}
+.rotLock svg{color:var(--accent,#e06a55);animation:rotHint 2.4s cubic-bezier(.6,0,.3,1) infinite}.rotLock small{display:block;color:var(--dim,#b3a797);font-size:13px;margin-top:4px}}
+@keyframes rotHint{0%,20%{transform:rotate(90deg)}55%,100%{transform:rotate(0)}}
 .runBtn span{transform:translateY(-.5px)}
 .runBtn:hover{transform:rotate(0) scale(1.06)}
 .runBtn:active{transform:rotate(0) scale(.94);background:rgba(214,96,72,.9)!important;color:#1a1210!important}
@@ -1722,4 +1726,5 @@ document.addEventListener("click",e=>{if(!window._pdIn||!document.body.classList
 <script>if(matchMedia("(max-width:899px)").matches){const t=document.createElement("script");t.src="sumi-bg.js";document.body.appendChild(t)}</script>
 
 
+<div class="rotLock" aria-live="polite"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg><div>請把手機轉回直的<small>勇者試煉只能直式遊玩</small></div></div>
 </body></html>
