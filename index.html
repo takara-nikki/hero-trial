@@ -1092,8 +1092,8 @@ function show(){
   vsay(q,false);
   try{document.activeElement&&document.activeElement.blur()}catch(e){}
   const o=$("opts");o.innerHTML="";
-  shuffle(q.opts).forEach(t=>{const b=document.createElement("button");b.textContent=t;b.onclick=()=>{if(b.disabled)return;[...o.children].forEach(x=>x.classList.remove("sel"));b.classList.add("sel");B.sel=[b,t];$("check").disabled=false;if(B.k==="vocab"){$("check").onclick();return}try{sfx("tap")}catch(e){}};o.appendChild(b)});
-  B.sel=null;$("check").disabled=true;$("check").hidden=B.k==="vocab";$("fb").hidden=true;$("battle").classList.remove("isOk","isNg");
+  shuffle(q.opts).forEach(t=>{const b=document.createElement("button");b.textContent=t;b.onclick=()=>{if(b.disabled)return;[...o.children].forEach(x=>x.classList.remove("sel"));b.classList.add("sel");B.sel=[b,t];$("check").disabled=false;$("check").onclick();return;try{sfx("tap")}catch(e){}};o.appendChild(b)});
+  B.sel=null;$("check").disabled=true;$("check").hidden=true;$("fb").hidden=true;$("battle").classList.remove("isOk","isNg");
   $("qProg").style.width=(B.i/B.qs.length*100)+"%";
   $("monHp").style.width=B.mon+"%";$("myHp").style.width=B.me+"%";
 }
