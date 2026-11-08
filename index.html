@@ -687,6 +687,19 @@ body.inYokai #stageBg{opacity:0}
 .achB b{font-size:13px;line-height:1.25}.achB small{font-size:11px;color:var(--dim);line-height:1.35}
 .achB.got{opacity:1;filter:none;border-color:color-mix(in srgb,var(--gold) 45%,transparent);background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 10%,transparent),transparent)}
 .achB.got .achIc{border:1.5px solid var(--gold);color:var(--gold);box-shadow:inset 0 0 0 3px rgba(0,0,0,.25),inset 0 0 0 4px color-mix(in srgb,var(--gold) 35%,transparent)}
+.catTitle{margin-top:10px;font-size:15px;color:var(--gold);letter-spacing:.04em}
+.achCat{display:grid;gap:12px}
+.catRow{display:grid;gap:8px;padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.015)}
+.catHead{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.catHead b{font-size:15px}.catHead span{font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
+.catBar{height:5px;border-radius:3px;background:var(--line);overflow:hidden}.catBar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,#b07a4f,var(--gold))}
+.achB.t1 .achIc,.achB.t2 .achIc,.achB.t3 .achIc{width:40px;height:40px;position:relative}
+.achB.t1 b,.achB.t2 b,.achB.t3 b{font-size:11.5px;white-space:nowrap;letter-spacing:-.02em}
+.achB.got.t1{border-color:rgba(192,138,90,.5);background:linear-gradient(180deg,rgba(192,138,90,.12),transparent)}
+.achB.got.t1 .achIc{color:#d39a6a;border:1.5px solid #c08a5a;box-shadow:none}
+.achB.got.t2{border-color:rgba(205,214,224,.45);background:linear-gradient(180deg,rgba(205,214,224,.1),transparent)}
+.achB.got.t2 .achIc{color:#dfe5ec;border:1.5px solid #cdd6e0;box-shadow:inset 0 0 0 3px rgba(0,0,0,.3),inset 0 0 0 4.5px rgba(205,214,224,.55)}
+.achB.got.t3 .achIc{color:var(--gold);border:1.5px solid var(--gold);box-shadow:inset 0 0 0 3px rgba(0,0,0,.3),inset 0 0 0 4.5px color-mix(in srgb,var(--gold) 55%,transparent),0 0 16px color-mix(in srgb,var(--gold) 45%,transparent)}
+.achB.got.t3 .achIc::after{content:"";position:absolute;inset:-8px;border-radius:50%;background:repeating-conic-gradient(var(--gold) 0 3deg,transparent 3deg 30deg);-webkit-mask:radial-gradient(circle,transparent 58%,#000 60%,#000 66%,transparent 70%);mask:radial-gradient(circle,transparent 58%,#000 60%,#000 66%,transparent 70%);opacity:.7}
 .achPop{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top,0px));z-index:200;display:flex;gap:12px;align-items:center;min-width:260px;max-width:calc(100vw - 32px);padding:12px 18px 12px 12px;border-radius:18px;background:rgba(24,18,15,.92);border:1px solid color-mix(in srgb,var(--gold) 55%,transparent);box-shadow:0 14px 40px rgba(0,0,0,.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transform:translate(-50%,-140%);opacity:0;transition:transform .55s cubic-bezier(.2,.9,.25,1.15),opacity .4s}
 .achPop.on{transform:translate(-50%,0);opacity:1}
 .achPop .achIc{flex:none;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:var(--gold);border:1.5px solid var(--gold);box-shadow:inset 0 0 0 3px rgba(0,0,0,.3),inset 0 0 0 4px color-mix(in srgb,var(--gold) 40%,transparent)}
@@ -880,7 +893,7 @@ body.inBattle #stageBg{opacity:.55;transform:none}
   </section>
   </div>
   <div id="boxView" class="wrap" style="max-width:none" hidden>
-    <section class="box" style="display:grid;gap:10px"><div class="row" style="justify-content:space-between;align-items:baseline"><b style="font-family:var(--head);font-size:20px;color:var(--gold)">じっせき（成就）</b><span class="sub" id="achSum"></span></div><div id="achGrid" class="achGrid"></div></section>
+    <section class="box" style="display:grid;gap:10px"><div class="row" style="justify-content:space-between;align-items:baseline"><b style="font-family:var(--head);font-size:20px;color:var(--gold)">じっせき（成就）</b><span class="sub" id="achSum"></span></div><div id="achGrid" class="achGrid"></div><b class="catTitle">たんご（單字分類）</b><div id="achCat" class="achCat"></div></section>
     <section class="box" style="display:grid;gap:6px">
       <b style="font-family:var(--head);font-size:20px;color:var(--gold)">せんりひん（戰利品）</b>
       <p class="sub">每一題練滿三天（三個日期徽章）就會收進來。試煉答對會自動蓋今天的章，題庫裡也可以按「今日」自己蓋。</p>
@@ -1328,6 +1341,16 @@ const ACH=[
  ["mock","模擬考初陣","在模擬考當天完成一次試煉","M6 3h9l4 4v14H6zM15 3v4h4M9 12h7M9 16h5"],
  ["d100","倒數 100 天","離考試剩 100 天內打開 App","M7 3h10M7 21h10M8 3c0 5 8 5 8 9s-8 4-8 9M16 3c0 5-8 5-8 9"]
 ];
+// 單字分類成就：銅（記熟 10）、銀（一半）、金（全部）
+const VCATS=[["人・身體・工作",["見習い觀察員","人間觀察家","人類圖鑑大師"],"M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0"],
+ ["生活・食物・購物",["便利商店常客","菜市場殺價王","生活奧義皆傳"],"M5 9h14l-1.5 11h-11zM9 9l3-5 3 5"],
+ ["學校・交通・自然",["新手旅人","電車通勤者","日本列島走破"],"M6 3h12v12H6zM6 10h12M9 18l-2 3M15 18l2 3M9 13h.01M15 13h.01"],
+ ["動詞",["動詞見習生","動詞使い","動詞の神"],"M5 12h13M13 6l6 6-6 6"],
+ ["形容詞・副詞",["形容新手","形容名人","形容詞の魔術師"],"M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M18 6l-2.5 2.5M8.5 15.5L6 18"],
+ ["外來語・寒暄",["片假名初心者","寒暄王","おもてなし大使"],"M4 5h16v11H9l-5 4z"]];
+const vcatN=c=>VW.filter(x=>x[7]===c).length,vcatGoal=(c,t)=>{const n=vcatN(c);return t===0?Math.min(10,n):t===1?Math.ceil(n/2):n};
+VCATS.forEach((c,i)=>c[1].forEach((nm,t)=>ACH.push(["c"+i+t,nm,`「${c[0]}」記熟 ${t===0?"10 個":t===1?"一半":"全部"}單字`,c[2],t+1,i])));
+const vcatOk=c=>VW.reduce((a,x)=>a+(x[7]===c&&stOf("v:"+x[0])==="ok"?1:0),0);
 S.ach=S.ach||{};S.cnt=S.cnt||{ok:0,lrun:0};S.cleared=S.cleared||{};S.lost=S.lost||{};
 const achQ=[];let achBusy=false;
 const achSvg=(d,s)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
@@ -1336,7 +1359,7 @@ function achShow(){if(achBusy||!achQ.length)return;achBusy=true;const a=achQ.shi
   el.innerHTML=`<span class="achIc">${achSvg(a[3],30)}</span><div><small>実績解除！（成就解鎖）</small><b>${a[1]}</b><span>${a[2]}</span></div>`;document.body.appendChild(el);
   setTimeout(()=>sfx("chime"),80);requestAnimationFrame(()=>el.classList.add("on"));
   setTimeout(()=>{el.classList.remove("on");setTimeout(()=>{el.remove();achBusy=false;achShow()},450)},3000)}
-function achState(){const st=S.streak||0;if(st>=3)achGet("st3");if(st>=7)achGet("st7");if(st>=30)achGet("st30");
+function achState(){VCATS.forEach((c,i)=>{const ok=vcatOk(c[0]);[0,1,2].forEach(t=>{if(ok>=vcatGoal(c[0],t))achGet("c"+i+t)})});const st=S.streak||0;if(st>=3)achGet("st3");if(st>=7)achGet("st7");if(st>=30)achGet("st30");
   const ok=S.cnt.ok||0;if(ok>=100)achGet("ok100");if(ok>=500)achGet("ok500");if(ok>=1000)achGet("ok1000");
   if((S.wrong||[]).length)S.wrongEver=1;else if(S.wrongEver)achGet("oni");
   const pr=Object.values(S.mark||{}).some(v=>v==="pr");if(pr)S.prEver=1;else if(S.prEver)achGet("pron");
@@ -1349,8 +1372,10 @@ function achEnd(win,ok,n,k,ms){const h=new Date().getHours();
   if(win){if(ok===n&&n>=5)achGet("perfect");if(ms<60000)achGet("speed");if(S.lost[k]){achGet("comeback");delete S.lost[k]}if(k!=="wrong")S.cleared[k]=1;if(h<7&&h>=4)achGet("early");if(h<4)achGet("night")}else S.lost[k]=1;
   try{const start=P(S.planStart||new Date().toLocaleDateString("sv")),day=Math.round((P(new Date().toLocaleDateString("sv"))-start)/864e5),total=Math.max(1,Math.round((P(examStr())-start)/864e5));if([.6,.85,.95].map(f=>Math.round(f*total)).includes(day))achGet("mock")}catch(e){}
   store.set(S)}
-function renderAch(){const g=$("achGrid");if(!g)return;const got=Object.keys(S.ach).length;$("achSum").textContent=`${got} / ${ACH.length} 個成就`;
-  g.innerHTML=ACH.map(a=>{const d=S.ach[a[0]];return `<div class="achB${d?" got":""}"><span class="achIc">${achSvg(a[3],26)}</span><b>${a[1]}</b><small>${d?d.slice(5).replace("-","/")+" 解鎖":a[2]}</small></div>`}).join("")}
+function renderAch(){const g=$("achGrid");if(!g)return;const got=Object.keys(S.ach).filter(k=>ACH.some(a=>a[0]===k)).length;$("achSum").textContent=`${got} / ${ACH.length} 個成就`;
+  const badge=a=>{const d=S.ach[a[0]];return `<div class="achB${d?" got":""}${a[4]?" t"+a[4]:""}"><span class="achIc">${achSvg(a[3],a[4]?22:26)}</span><b>${a[1]}</b><small>${d?d.slice(5).replace("-","/")+" 解鎖":a[4]?["記熟 10 個","記熟一半","全部記熟"][a[4]-1]:a[2]}</small></div>`};
+  const cg=$("achCat");if(cg)cg.innerHTML=VCATS.map((c,i)=>{const ok=vcatOk(c[0]),n=vcatN(c[0]);return `<div class="catRow"><div class="catHead"><b>${c[0]}</b><span>${ok} / ${n}</span></div><div class="catBar"><i style="width:${n?Math.round(ok/n*100):0}%"></i></div><div class="achGrid">${ACH.filter(a=>a[5]===i&&a[4]).map(badge).join("")}</div></div>`}).join("");
+  g.innerHTML=ACH.filter(a=>!a[4]).map(a=>{const d=S.ach[a[0]];return `<div class="achB${d?" got":""}"><span class="achIc">${achSvg(a[3],26)}</span><b>${a[1]}</b><small>${d?d.slice(5).replace("-","/")+" 解鎖":a[2]}</small></div>`}).join("")}
 setTimeout(()=>{try{achState()}catch(e){}},1500);
 function renderBox(){
   renderAch();
