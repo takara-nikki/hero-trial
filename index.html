@@ -28,17 +28,17 @@
 .fx-stamp.big{font-size:72px}
 </style></head><body>
 
-<title>タカラ勇者試煉</title>
+<title>タカラ恩賜試煉</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="タカラ勇者試煉">
+<meta name="apple-mobile-web-app-title" content="タカラ恩賜試煉">
 <meta name="theme-color" content="#161311">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=2">
 <link rel="icon" type="image/png" href="img/icon.png">
-<meta name="apple-mobile-web-app-title" content="タカラ勇者試煉">
-<meta name="application-name" content="勇者試煉">
+<meta name="apple-mobile-web-app-title" content="タカラ恩賜試煉">
+<meta name="application-name" content="恩賜試煉">
 <meta name="theme-color" content="#161311">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Yuji+Boku&family=IBM+Plex+Sans+JP:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
@@ -805,7 +805,7 @@ body.inBattle #stageBg{opacity:.55;transform:none}
 <canvas id="sakura" aria-hidden="true"></canvas>
 <div class="wrap shell">
   <div class="titleOut">
-    <h1 class="logoImg"><img src="img/title.webp" alt="タカラ勇者試煉　TAKARA・JLPT N4" width="1100" height="318" decoding="async"></h1>
+    <h1 class="logoImg"><img src="img/title.webp" alt="タカラ恩賜試煉　TAKARA・JLPT N4" width="1100" height="318" decoding="async"></h1>
     
   </div>
   <header class="box top">
@@ -841,7 +841,7 @@ body.inBattle #stageBg{opacity:.55;transform:none}
     </div>
   </header>
   <nav class="tabs" aria-label="主要分頁">
-    <div class="brand"><span class="sealSq" aria-hidden="true">宝</span><span class="bt">タカラ勇者試煉<small id="brandExam">JLPT N4</small></span></div>
+    <div class="brand"><span class="sealSq" aria-hidden="true">宝</span><span class="bt">タカラ恩賜試煉<small id="brandExam">JLPT N4</small></span></div>
     <button id="tabGame" class="on"><i aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="m16 16 4 4"/><path d="m19 21 2-2"/><path d="M9.5 6.5 21 18v3h-3L6.5 9.5" opacity="0"/><path d="M14.5 6.5 18 3h3v3l-3.5 3.5"/><path d="m5 14 6 6"/><path d="m7 17-3 3"/><path d="m3 19 2 2"/></svg></i><span>しれん<small>試煉</small></span></button>
     <button id="tabLib"><i aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z"/><path d="m15.5 10.5 3 3m0-3-3 3"/></svg></i><span>べんきょう<small>題庫</small></span></button>
     <button id="tabBox"><i aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 10V8a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/><path d="M12 12v3"/></svg></i><span>たからばこ<small>寶物箱 <b id="boxN">0</b></small></span></button>
@@ -1709,7 +1709,7 @@ document.addEventListener("click",e=>{if(!window._pdIn||!document.body.classList
   const done=msg=>{t.textContent=msg;b.classList.add("done");setTimeout(()=>{t.textContent="分享連結";b.classList.remove("done")},2200)};
   const copy=async()=>{try{await navigator.clipboard.writeText(url);done("已複製連結");return}catch(e){}
     const i=$("shareUrl");i.focus();i.select();try{document.execCommand("copy");done("已複製連結")}catch(e){done("請長按上面的連結複製")}};
-  b.onclick=async()=>{if(navigator.share){try{await navigator.share({title:"タカラ勇者試煉",text:"一起來試煉，練 N4 日文！",url});return}catch(e){if(e&&e.name==="AbortError")return}}copy()};
+  b.onclick=async()=>{if(navigator.share){try{await navigator.share({title:"タカラ恩賜試煉",text:"一起來試煉，練 N4 日文！",url});return}catch(e){if(e&&e.name==="AbortError")return}}copy()};
   $("shareUrl").onclick=e=>e.target.select()})();
 // ── 開場：約 2.4 秒後自動進首頁 ──
 (()=>{const sp=$("splash");if(!sp)return;setTimeout(()=>{sp.classList.add("out");setTimeout(()=>sp.remove(),760)},2000)})();
@@ -1726,5 +1726,5 @@ document.addEventListener("click",e=>{if(!window._pdIn||!document.body.classList
 <script>if(matchMedia("(max-width:899px)").matches){const t=document.createElement("script");t.src="sumi-bg.js";document.body.appendChild(t)}</script>
 
 
-<div class="rotLock" aria-live="polite"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg><div>請把手機轉回直的<small>勇者試煉只能直式遊玩</small></div></div>
+<div class="rotLock" aria-live="polite"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg><div>請把手機轉回直的<small>恩賜試煉只能直式遊玩</small></div></div>
 </body></html>
