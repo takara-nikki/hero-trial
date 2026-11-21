@@ -26,6 +26,56 @@
 .fx-stamp{position:fixed;left:50%;top:38%;z-index:10001;pointer-events:none;font-family:"Yuji Syuku",serif;font-size:50px;line-height:1.1;color:#E06A55;border:4px double #E06A55;border-radius:12px;padding:6px 18px 2px;background:color-mix(in srgb,var(--panel) 90%,transparent);white-space:nowrap;box-shadow:0 10px 28px rgba(0,0,0,.25)}
 .fx-stamp.combo{color:var(--gold);border:2px solid var(--gold);outline:1px solid color-mix(in srgb,var(--gold) 40%,transparent);outline-offset:3px;font-size:44px}
 .fx-stamp.big{font-size:72px}
+
+/* ════ 總進度・配速・激勵 ════ */
+#journey{display:grid;gap:10px}
+.jHead{display:flex;align-items:baseline;gap:8px}
+.jHead b{font-family:var(--head);font-size:17px}
+.jPct{margin-left:auto;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:15px;color:var(--dim)}
+.jPct b{font-size:28px;color:var(--ink);font-family:var(--mono)}
+.jTitle{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--dim)}
+.jTitle .jSeal{font-family:"Yuji Syuku",serif;color:var(--seal);border:2px solid var(--seal);border-radius:6px;padding:0 6px;line-height:1.5;transform:rotate(-6deg);font-size:15px}
+.jTitle strong{color:var(--gold);font-weight:700}
+.jBar{position:relative;height:14px;border-radius:99px;background:rgba(242,236,228,.08);overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.3)}
+.jBar i{position:absolute;left:0;top:0;bottom:0;border-radius:inherit;transition:width .9s cubic-bezier(.22,1,.36,1)}
+.jBar .w{background:color-mix(in srgb,var(--accent) 30%,transparent)}
+.jBar .b{background:var(--grad);box-shadow:inset 0 2px 0 rgba(255,255,255,.25)}
+.jBar .m{position:absolute;top:0;bottom:0;width:2px;background:rgba(0,0,0,.35)}
+.jNums{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14px;color:var(--dim)}
+.jNums b{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--ink);font-size:16px}
+.jNums .lg{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:0}
+.jNext{font-size:14.5px;color:var(--ink);opacity:.9}
+.jNext b{color:var(--gold);font-family:var(--mono)}
+.jPace{display:grid;gap:6px;padding:12px 14px;border-radius:12px;background:color-mix(in srgb,var(--panel) 70%,var(--bg));border:1px solid var(--line)}
+.jPace .row1{display:flex;align-items:baseline;gap:8px;font-size:15px}
+.jPace .row1 span:last-child{margin-left:auto;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:15px;color:var(--dim)}
+.jPace .row1 span:last-child b{font-size:22px;color:var(--ink)}
+.jPace.met .row1 span:last-child b{color:var(--ok)}
+.jPace .bar2{height:8px;border-radius:99px;background:rgba(242,236,228,.08);overflow:hidden}
+.jPace .bar2 i{display:block;height:100%;width:0;border-radius:inherit;background:var(--grad);transition:width .8s cubic-bezier(.22,1,.36,1)}
+.jPace.met .bar2 i{background:linear-gradient(120deg,#7FD3A6,#4FB386)}
+.jPace small{font-size:13px;color:var(--dim);line-height:1.5}
+.jHelp{font-size:12.5px;color:var(--dim);margin:0}
+.dunP{position:relative;z-index:2;display:flex;align-items:center;gap:8px;margin-top:8px}
+.dunBar{flex:1;height:6px;border-radius:99px;background:rgba(242,236,228,.14);overflow:hidden}
+.dunBar i{display:block;height:100%;border-radius:inherit;background:var(--grad);transition:width .9s cubic-bezier(.22,1,.36,1)}
+.dunP em{font-style:normal;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:12px;color:var(--ink);opacity:.85;white-space:nowrap}
+.kpi.streak b{font-family:var(--mono)}
+.kpi.streak .ki{color:var(--accent)}
+.kpi.streak.cold .ki{color:var(--dim)}
+.pTask{position:relative;border-radius:12px}
+.pTask span{transition:opacity .3s}
+.pTask:has(input:checked) span{text-decoration:line-through;opacity:.55}
+.pTask:has(input:checked) button{visibility:hidden}
+.pTask:has(input:checked)::after{content:"宝";position:absolute;right:14px;top:50%;width:34px;height:34px;margin-top:-17px;display:grid;place-items:center;font-family:"Yuji Syuku",serif;font-size:20px;line-height:1;color:var(--seal);border:2px solid var(--seal);border-radius:50%;transform:rotate(-12deg);opacity:.9;animation:pSeal .42s cubic-bezier(.2,.9,.3,1)}
+@keyframes pSeal{from{transform:rotate(-24deg) scale(1.8);opacity:0}to{transform:rotate(-12deg) scale(1);opacity:.9}}
+@media (prefers-reduced-motion:reduce){.pTask:has(input:checked)::after{animation:none}.jBar i,.dunBar i,.jPace .bar2 i{transition:none}}
+@media (min-width:900px){
+  #gameView>#journey{grid-column:1!important;grid-row:1}
+  #gameView>#todayPlan{grid-row:2!important}
+  #gameView>#wrongBox{grid-row:3!important}
+  #gameView>#home{grid-row:1/span 3!important}
+}
 </style></head><body>
 
 <title>タカラ勇者試煉</title>
@@ -814,6 +864,7 @@ body.inBattle #stageBg{opacity:.55;transform:none}
         <div class="kpiLine">
           <button id="dayBtn" class="kpi" aria-expanded="false" title="點我改起始日"><svg class="ki" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><b id="dayN">—</b>日目</button>
           <span class="kpi" title="2027 年 7 月 JLPT N4"><svg class="ki" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>試験まで<b id="days">—</b>日</span>
+          <span class="kpi streak" id="streakKpi" title="連續學習天數"><svg class="ki" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-3 2-4.5 2-7 1.2 1 2 2 3 2.5"/></svg><b id="streakN">0</b>連続</span>
           <span class="kpi"><svg class="ki" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 4 2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 16.4 7.2 18.9l.9-5.4L4.2 9.7l5.4-.8z"/></svg>Lv<b id="lv">1</b></span>
           <details class="voiceSet" id="voiceSet"><summary class="kpi iconOnly" aria-label="聲音設定" title="聲音設定"><svg class="ki" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16.5 9a4 4 0 0 1 0 6"/></svg><span class="vh">こえ</span></summary>
           <div class="voicePop"><div class="sub">目前：<span id="vName">自動挑選</span></div>
@@ -850,6 +901,15 @@ body.inBattle #stageBg{opacity:.55;transform:none}
   <div id="gameView" class="wrap" style="max-width:none">
 
 
+  <section id="journey" class="box" aria-label="N4 總進度">
+    <div class="jHead"><b>N4 總進度</b><span class="jPct"><b id="jPct">0</b>%</span></div>
+    <div class="jTitle"><span class="jSeal">称号</span><strong id="jTitle">見習い勇者</strong></div>
+    <div class="jBar" id="jBar"><i class="w" id="jW"></i><i class="b" id="jB"></i></div>
+    <div class="jNums" id="jNums"></div>
+    <div class="jNext" id="jNext"></div>
+    <div class="jPace" id="jPace"><div class="row1"><b>今日の目標（今日目標）</b><span><b id="jToday">0</b> / <span id="jGoal">0</span> 章</span></div><div class="bar2"><i id="jPaceBar"></i></div><small id="jPaceTxt"></small></div>
+    <p class="jHelp">同一題在 3 個不同的日子答對＝收服，收進寶物箱。</p>
+  </section>
   <section id="todayPlan" class="box" style="display:grid;gap:10px">
     <button type="button" class="planHead" id="planToggle" aria-expanded="true" aria-controls="planBody"><b style="font-size:17px">今日學習計畫</b><span class="planMini" id="planMini"></span><span class="tag" id="planWeek">—</span><svg class="planChev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
     <div class="planBody" id="planBody"><div class="planInner">
@@ -1041,7 +1101,7 @@ function render(){
   $("days").textContent=d;
   const lv=1+Math.floor(S.xp/100);setNum("lv",lv);
   $("xpbar").style.width=(S.xp%100)+"%";$("xptxt").textContent=`XP ${S.xp%100} / 100`;
-  setNum("streak",S.streak);renderWeek();setNum("boxN",Object.keys(S.ach||{}).length);setNum("wrongN",S.wrong.length);
+  setNum("streak",S.streak);renderWeek();try{renderJourney()}catch(e){}setNum("boxN",Object.keys(S.ach||{}).length);setNum("wrongN",S.wrong.length);
   const wk=Math.ceil(d/7);
   $("plan").textContent=d>140?`第一階段打底（還有 ${wk} 週）：毎日（まいにち）單字＋文法各一場，こつこつ（一點一滴）來。`:d>56?`第二階段（還有 ${wk} 週）：每天加一場讀解或聽解，がんばって！`:`ラストスパート（最後衝刺，還有 ${wk} 週）：每天打ラスボス＋聽解。`;
   const ul=$("wrongList");
@@ -1220,7 +1280,7 @@ function end(){
   S.xp+=B.me>0?20:5;store.set(S);setTimeout(()=>sfx(B.me>0?"rin":"ng"),120);
   const win=B.me>0,ok=B.ok||0,n=B.qs.length;
   setTimeout(()=>{try{achEnd(win,ok,n,B.k,Date.now()-(B.t0||Date.now()))}catch(e){}},900);
-  if(B.k==="listen"&&n>=8){S.done=S.done||{};const td=new Date().toLocaleDateString("sv");(S.done[td]=S.done[td]||{}).listen=true;store.set(S);try{renderPlan()}catch(e){}}
+  if(B.k!=="wrong"&&n>=8){S.done=S.done||{};const td=new Date().toLocaleDateString("sv");(S.done[td]=S.done[td]||{})[B.k]=true;store.set(S);try{renderPlan()}catch(e){}}
   $("result").innerHTML=`<div class="rTitle">${win?"かった！":"まけた……"}</div><div class="rSub">${win?"（贏了）おつかれさま（辛苦了）！":"（輸了）ガーン……"}</div>
     <p class="rLine">${win?`打倒了 ${esc(MON[B.k])}`:"不過まちがいノート又變胖了，明天再來。"}</p>
     <div class="rStats"><div><b>${ok}/${n}</b><small>答對</small></div><div><b>+${win?20:5}</b><small>XP</small></div></div>
@@ -1484,10 +1544,11 @@ function renderPlan(){
   tasks.push({k:"listen",go:"listen",t:"聽解 8 題（聽解祭）"});
   const today=S.done[todayStr]=S.done[todayStr]||{};
   const box=$("planTasks");
-  box.innerHTML=tasks.map(x=>`<label style="display:flex;gap:10px;align-items:center;font-size:15px;cursor:pointer"><input type="checkbox" data-k="${x.k}" ${today[x.k]?"checked":""} style="width:20px;height:20px"><span>${x.t}</span><button data-go="${x.go}" style="margin-left:auto;padding:4px 10px;font-size:13px">去打</button></label>`).join("");
+  box.innerHTML=tasks.map(x=>`<label class="pTask" style="display:flex;gap:10px;align-items:center;font-size:15px;cursor:pointer"><input type="checkbox" data-k="${x.k}" ${today[x.k]?"checked":""} style="width:20px;height:20px"><span>${x.t}</span><button data-go="${x.go}" style="margin-left:auto;padding:4px 10px;font-size:13px">去打</button></label>`).join("");
   const n=tasks.filter(x=>today[x.k]).length;
-  $("planProg").textContent=`今天完成 ${n} / ${tasks.length}　（之後記得打勾，連續天數會自己算）`;
+  $("planProg").textContent=`今天完成 ${n} / ${tasks.length}　（打完一場會自動打勾）`;
   $("planMini").textContent=`${n}/${tasks.length} 完成`;$("planMini").classList.toggle("done",n===tasks.length&&tasks.length>0);
+  if(n===tasks.length&&tasks.length){S.allDone=S.allDone||{};if(!S.allDone[todayStr]){S.allDone[todayStr]=1;S.xp+=30;planCheer()}}
   store.set(S);
 }
 $("todayPlan").addEventListener("change",e=>{
@@ -1672,6 +1733,44 @@ $("sfxTest").onclick=()=>{sfx("tap");setTimeout(()=>sfx("ok"),350);setTimeout(()
 // 一般按鈕＝水滴（答題選項、設定面板裡的不算，它們各自有聲音）
 document.addEventListener("click",e=>{const b=e.target.closest("button,.dun,.mate,.bdg.next");if(!b||b.closest("#opts")||b.closest(".voicePop")||b.id==="play"||b.classList.contains("sayBtn"))return;sfx("tap")},true);
 document.addEventListener("touchstart",()=>ac(),{passive:true,once:true});
+
+// ── 總進度・考前配速・里程碑稱號 ──
+const PKS=["vocab","grammar","reading","listen"];
+const MILES=[[0,"見習い勇者（見習勇者）"],[10,"駆け出し勇者（新手勇者）"],[25,"一人前の勇者（獨當一面）"],[50,"歴戦の勇者（身經百戰）"],[75,"伝説の勇者（傳說勇者）"],[100,"N4 鬼退治の勇者"]];
+MILES.slice(1).forEach(([p,nm])=>ACH.push(["m"+p,nm.replace(/（.*）/,""),`N4 總進度達到 ${p}%`,"M5 21V4M5 4h11l-2 4 2 4H5"]));
+function progStat(){const t=today(),r={n:0,box:0,wip:0,need:0,td:0,k:{}};
+  PKS.forEach(k=>{let n=0,b=0,w=0;BANK[k].forEach(x=>{const key=keyOf(k,x),a=S.stamp[key]||[];n++;
+    if(S.box[key])b++;else{if(a.length)w++;r.need+=3-Math.min(3,a.length)}if(a.includes(t))r.td++});
+    r.k[k]={n,b,w};r.n+=n;r.box+=b;r.wip+=w});return r}
+function renderJourney(){const r=progStat(),pct=r.n?r.box/r.n*100:0,pw=r.n?(r.box+r.wip)/r.n*100:0;
+  $("jB").style.width=pct+"%";$("jW").style.width=pw+"%";
+  const ip=Math.floor(pct);if(!$("jPct").dataset.v&&ip===0)$("jPct").textContent=0;else setNum("jPct",ip);
+  const lv=MILES.filter(m=>pct>=m[0]).pop(),nx=MILES.find(m=>pct<m[0]);
+  $("jTitle").textContent=lv[1];
+  $("jNums").innerHTML=`<span><i class="lg" style="background:var(--grad)"></i>收服 <b>${r.box}</b></span><span><i class="lg" style="background:color-mix(in srgb,var(--accent) 30%,transparent)"></i>練習中 <b>${r.wip}</b></span><span>還剩 <b>${r.n-r.box}</b> / ${r.n} 題</span>`;
+  $("jNext").innerHTML=nx?`再收服 <b>${Math.ceil(nx[0]/100*r.n)-r.box}</b> 題，升級成「${nx[1].replace(/（.*）/,"")}」`:"全部收服！你就是 N4 鬼退治の勇者。";
+  // 各關卡小進度條
+  document.querySelectorAll("#home .dun").forEach(d=>{const k=d.dataset.k;let el=d.querySelector(".dunP");
+    if(!el){el=document.createElement("span");el.className="dunP";el.innerHTML='<span class="dunBar"><i></i></span><em></em>';d.appendChild(el)}
+    if(k==="wrong"){const w=(S.wrong||[]).length;el.querySelector(".dunBar").style.display="none";el.querySelector("em").textContent=w?`還有 ${w} 隻鬼`:"目前沒有鬼";return}
+    const s=r.k[k];if(!s)return;el.querySelector("i").style.width=(s.n?s.b/s.n*100:0)+"%";el.querySelector("em").textContent=`${s.b} / ${s.n}`});
+  // 考前配速：今天開始時還要蓋的章 ÷ 剩下天數
+  const left=Math.ceil((examDate()-new Date())/864e5),pace=$("jPace");
+  if(left<=0||r.box>=r.n){pace.classList.add("met");$("jToday").textContent=r.td;$("jGoal").textContent=r.td;$("jPaceBar").style.width="100%";$("jPaceTxt").textContent=r.box>=r.n?"題庫全部收服了，剩下就是保持手感。":"考試辛苦了！";}
+  else{const goal=Math.max(1,Math.ceil((r.need+r.td)/left)),met=r.td>=goal;
+    setNum("jToday",r.td);$("jGoal").textContent=goal;$("jPaceBar").style.width=Math.min(100,r.td/goal*100)+"%";pace.classList.toggle("met",met);
+    const fights=Math.max(1,Math.ceil(goal/8));
+    $("jPaceTxt").textContent=met?`今天達標了！明天也照這個速度，考前就能全部收服。`:`離考試 ${left} 天：每天蓋 ${goal} 個章（大約 ${fights} 場試煉）就趕得上，還差 ${goal-r.td} 個。`}
+  // 里程碑
+  MILES.slice(1).forEach(([p])=>{if(pct>=p&&!S.ach["m"+p]){achGet("m"+p);setTimeout(()=>FX.stamp("昇格",{cls:"combo",top:"30%"}),B?1900:200)}});
+  // 連續天數
+  const t=today(),y=new Date(Date.now()-864e5).toLocaleDateString("sv"),alive=S.last===t||S.last===y,st=alive?(S.streak||0):0;
+  setNum("streakN",st);const sk=$("streakKpi");sk.classList.toggle("cold",S.last!==t);sk.title=S.last===t?`連續學習 ${st} 天`:st?`連續 ${st} 天，今天打一場就不會斷`:"今天打一場，開始累積連續天數";
+}
+function planCheer(){const go=()=>{FX.stamp("制霸",{cls:"big",top:"34%"});const p=$("todayPlan");if(p)FX.at(p,{n:28,speed:5,cols:["#B8862A","#E7C47A","#C8402F","#1A1714"]});
+    const el=document.createElement("div");el.className="achPop";el.innerHTML='<span class="achIc" style="font-family:\'Yuji Syuku\',serif;font-size:26px">宝</span><div><small>今日の計画ぜんぶクリア！（今日計畫全部完成）</small><b>+30 XP</b><span>明天也來一下，連續天數 +1</span></div>';
+    const pop=()=>{if(achBusy)return setTimeout(pop,400);achBusy=true;document.body.appendChild(el);requestAnimationFrame(()=>el.classList.add("on"));setTimeout(()=>{el.classList.remove("on");setTimeout(()=>{el.remove();achBusy=false;achShow()},450)},3000)};pop();try{render()}catch(e){}};
+  setTimeout(go,B?2200:250)}
 
 renderDay();
 render();
