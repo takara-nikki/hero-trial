@@ -84,10 +84,11 @@
 #libChips button small{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:12px;opacity:.8}
 #libChips button.on{background:var(--grad)!important;color:#fff!important;box-shadow:0 4px 14px var(--glow),inset 0 -3px 0 rgba(0,0,0,.18)}
 #libChips button:active{transform:scale(.97)}
-#libChips+.chips{margin-top:6px!important;padding-top:14px;border-top:1px dashed var(--line)}
-#libSub[hidden]+#libState{margin-top:6px!important;padding-top:14px;border-top:1px dashed var(--line)}
-#libSub button,#libState button{min-height:34px!important;padding:3px 12px!important;font-size:13.5px!important;color:var(--dim);background:transparent!important;border-color:var(--line)!important}
-#libSub button.on,#libState button.on{background:var(--soft)!important;border-color:var(--accent)!important;color:var(--accent)!important;box-shadow:none}
+.libFilt{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px;margin-top:4px;padding-top:12px;border-top:1px dashed var(--line)}
+.libSel{position:relative;display:grid;gap:4px;min-width:0}
+.libSel>span{font-size:12.5px;color:var(--dim);letter-spacing:.06em;padding-left:4px}
+.libSel select{appearance:none;-webkit-appearance:none;width:100%;min-height:46px;font:inherit;font-size:15px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 34px 8px 12px;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23E06A55' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.libSel select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 @media (prefers-reduced-motion:reduce){#libChips button{transition:none}}
 </style></head><body>
 
@@ -1018,8 +1019,7 @@ body.inBattle #stageBg{opacity:.55;transform:none}
     <section class="box" style="display:grid;gap:10px">
       <p class="sub">不會沒關係，先在這裡看懂再去打。全部 <span id="libN">0</span> 筆，答案、翻譯、說明都在。</p>
       <div class="chips" id="libChips"></div>
-      <div class="chips" id="libSub"></div>
-      <div class="chips" id="libState"></div>
+      <div class="libFilt"><label class="libSel" id="libSub"></label><label class="libSel" id="libState"></label></div>
       <input id="libSearch" type="search" placeholder="さがす（搜尋）：漢字、讀音或中文" style="font:inherit;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink)">
       <label class="sub"><input type="checkbox" id="libCover"> かくす（遮住答案，自己先想）</label>
     </section>
@@ -1323,12 +1323,12 @@ function renderLib(){
   $("libChips").innerHTML="";
   for(const k in KN){const b=document.createElement("button");b.innerHTML=`<span>${KN[k]}</span><small>${BANK[k].length}</small>`;if(k===libK)b.className="on";b.onclick=()=>{libK=k;libSub="";libSt="none";renderLib()};$("libChips").appendChild(b)}
   const sub=$("libSub");sub.innerHTML="";sub.hidden=libK!=="vocab";
-  if(libK==="vocab")["",...new Set(V.map(x=>x[7]))].forEach(c=>{const b=document.createElement("button");b.textContent=c||"全部";if(c===libSub)b.className="on";b.onclick=()=>{libSub=c;renderLib()};sub.appendChild(b)});
+  if(libK==="vocab"){sub.innerHTML=`<span>分類</span><select aria-label="單字分類">${["",...new Set(V.map(x=>x[7]))].map(c=>`<option value="${esc(c)}"${c===libSub?" selected":""}>${esc(c||"全部分類")}</option>`).join("")}</select>`;sub.querySelector("select").onchange=e=>{libSub=e.target.value;renderLib()}}
   $("libSearch").hidden=libK==="reading"||libK==="listen";
   const all=BANK[libK].map((x,i)=>[x,i,keyOf(libK,x)]);
   const cnt={"":all.length,miss:0,ng:0,pr:0,ok:0,none:0,box:0};all.forEach(([,,k])=>{if(S.miss[k])cnt.miss++;if(S.box[k])cnt.box++;const t=stOf(k);if(t in cnt)cnt[t]++});
   const sb=$("libState");sb.innerHTML="";
-  for(const t in ST){const b=document.createElement("button");b.textContent=ST[t]+" "+cnt[t];if(t===libSt)b.className="on";b.onclick=()=>{libSt=t;renderLib()};sb.appendChild(b)}
+  sb.innerHTML=`<span>狀態</span><select aria-label="記憶狀態">${Object.keys(ST).map(t=>`<option value="${t}"${t===libSt?" selected":""}>${ST[t]}（${cnt[t]}）</option>`).join("")}</select>`;sb.querySelector("select").onchange=e=>{libSt=e.target.value;renderLib()};
   const box=$("libList");box.innerHTML="";const qq=libQ.trim();
   let list=all.filter(([,,k])=>fits(k));
   if(libK==="vocab")list=list.filter(([x])=>(!libSub||x[7]===libSub)&&(!qq||x[0].includes(qq)||x[1].includes(qq)||x[2].includes(qq)));
