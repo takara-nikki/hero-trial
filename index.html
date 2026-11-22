@@ -55,6 +55,16 @@
 .jPace .bar2 i{display:block;height:100%;width:0;border-radius:inherit;background:var(--grad);transition:width .8s cubic-bezier(.22,1,.36,1)}
 .jPace.met .bar2 i{background:linear-gradient(120deg,#7FD3A6,#4FB386)}
 .jPace small{font-size:13px;color:var(--dim);line-height:1.5}
+.jPace .pHead{font-size:15px}
+.pRow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px}
+.pLab{font-size:14px;color:var(--dim);min-width:2.5em}
+.pBar{height:8px;border-radius:99px;background:rgba(242,236,228,.08);overflow:hidden}
+.pBar i{display:block;height:100%;width:0;border-radius:inherit;background:var(--grad);transition:width .8s cubic-bezier(.22,1,.36,1)}
+.pRow.met .pBar i{background:linear-gradient(120deg,#7FD3A6,#4FB386)}
+.pNum{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:14px;color:var(--dim);min-width:5.5em;text-align:right;white-space:nowrap}
+.pNum b{font-size:19px;color:var(--ink)}.pNum em{font-style:normal}
+.pRow.met .pNum b{color:var(--ok)}
+@media (prefers-reduced-motion:reduce){.pBar i{transition:none}}
 .jHelp{font-size:12.5px;color:var(--dim);margin:0}
 .dunP{position:relative;z-index:2;display:flex;align-items:center;gap:8px;margin-top:8px}
 .dunBar{flex:1;height:6px;border-radius:99px;background:rgba(242,236,228,.14);overflow:hidden}
@@ -965,7 +975,7 @@ body.inBattle #stageBg{opacity:.55;transform:none}
     <div class="jBar" id="jBar"><i class="w" id="jW"></i><i class="b" id="jB"></i></div>
     <div class="jNums" id="jNums"></div>
     <div class="jNext" id="jNext"></div>
-    <div class="jPace" id="jPace"><div class="row1"><b>今日の目標（今日目標）</b><span><b id="jToday">0</b> / <span id="jGoal">0</span> 章</span></div><div class="bar2"><i id="jPaceBar"></i></div><small id="jPaceTxt"></small></div>
+    <div class="jPace" id="jPace"><b class="pHead">今日の目標（今日目標）</b><div class="pRow" id="pNew"><span class="pLab">新題</span><span class="pBar"><i></i></span><span class="pNum"><b>0</b> / <em>0</em></span></div><div class="pRow" id="pRev"><span class="pLab">複習</span><span class="pBar"><i></i></span><span class="pNum"><b>0</b> / <em>0</em></span></div><small id="jPaceTxt"></small></div>
     <p class="jHelp">同一題在 3 個不同的日子答對＝收服，收進寶物箱。</p>
   </section>
   <section class="box" id="wrongBox">
@@ -1169,16 +1179,17 @@ function start(k,again){
   if(k==="wrong"){if(!S.wrong.length){return flash("ノートが空っぽ（空空的）！先去別的關卡製造一點錯題吧。")}qs=shuffle(S.wrong).slice(0,8)}
   else{ // 沒出過的優先；全部出過一輪才重來
     const pool=BANK[k];S.seen=S.seen||{};let seen=new Set(S.seen[k]||[]);
-    let fresh=shuffle(pool.filter(x=>!seen.has(keyOf(k,x))));
-    if(fresh.length<8){const rest=shuffle(pool.filter(x=>seen.has(keyOf(k,x))));seen=new Set();fresh=fresh.concat(rest)}
-    const pick=fresh.slice(0,8);pick.forEach(x=>seen.add(keyOf(k,x)));S.seen[k]=[...seen];store.set(S);
-    qs=pick.map(x=>toQ(k,x))}
+    const rv=shuffle(pool.filter(x=>isDue(keyOf(k,x)))).slice(0,4),rvK=new Set(rv.map(x=>keyOf(k,x))),want=8-rv.length;
+    let fresh=shuffle(pool.filter(x=>!seen.has(keyOf(k,x))&&!rvK.has(keyOf(k,x))));
+    if(fresh.length<want){const rest=shuffle(pool.filter(x=>seen.has(keyOf(k,x))&&!rvK.has(keyOf(k,x))));seen=new Set();fresh=fresh.concat(rest)}
+    const pick=shuffle(rv.concat(fresh.slice(0,want)));pick.forEach(x=>seen.add(keyOf(k,x)));S.seen[k]=[...seen];store.set(S);
+    qs=pick.map(x=>{const q=toQ(k,x);if(rvK.has(q.key))q.rv=1;return q})}
   B={k,qs,i:0,mon:100,me:100,hit:Math.ceil(100/qs.length),t0:Date.now()};
   $("home").hidden=true;$("battle").hidden=false;$("battle").classList.remove("ended");$("battle").dataset.k=k;$("stageBg").dataset.k=k;$("result").hidden=true;document.body.classList.add("inBattle");try{scrollTo({top:0,behavior:"instant"})}catch(e){}$("monName").textContent=MON[k];drawMon(COL[k],k);show();
 }
 function flash(t){const h=$("plan"),o=h.textContent;h.textContent=t;h.style.color="var(--hp)";setTimeout(()=>{h.style.color="";render()},2500)}
 function show(){
-  const q=B.qs[B.i];$("qn").textContent=`${B.i+1}/${B.qs.length}`;
+  const q=B.qs[B.i];$("qn").textContent=`${B.i+1}/${B.qs.length}`+(q.rv?" · 複習":"");
   $("passage").hidden=!q.p;$("passage").textContent=q.p||"";
   $("q").innerHTML=q.q.replace(/\n/g,"<br>");
   $("note").hidden=true;$("play").hidden=!q.say;$("msg").textContent=q.say?"先按「きいて」，耳朵準備好再選。":"";$("next").hidden=true;
@@ -1552,7 +1563,7 @@ function renderPlan(){
   const near=mockDays.map((d,i)=>[d-day,i]).find(([l])=>l>=0&&l<=3);
   $("mockAlert").hidden=!near;if(near)$("mockAlert").innerHTML=near[0]===0?`${IC("cal",18)} 今天是<b>模擬考 ${near[1]+1}</b>！找一段完整的時間，四關各打一場。`:`${IC("clock",18)} <b>模擬考 ${near[1]+1}</b> 還有 ${near[0]} 天（${fmt(mockDate(near[1]))}），先把錯題本清一清吧。`;
   const tasks=[];
-  tasks.push({k:"vocab",go:"vocab",t:phase<3?"新單字 5 個（單字洞窟）":"複習錯過的單字（單字洞窟）"});
+  tasks.push({k:"vocab",go:"vocab",t:phase<3?"單字洞窟打一場（新字＋複習）":"複習錯過的單字（單字洞窟）"});
   const gn=wd===6?2:[1,3,5].includes(wd)?1:0;
   if(gn)tasks.push({k:"grammar",go:"grammar",t:`文法 ${gn} 項（文法城堡）`});
   const rd=phase===1?[2,5]:phase===2?[1,3,5]:[0,1,2,3,4,5,6];
@@ -1754,9 +1765,16 @@ document.addEventListener("touchstart",()=>ac(),{passive:true,once:true});
 const PKS=["vocab","grammar","reading","listen"];
 const MILES=[[0,"見習い勇者（見習勇者）"],[10,"駆け出し勇者（新手勇者）"],[25,"一人前の勇者（獨當一面）"],[50,"歴戦の勇者（身經百戰）"],[75,"伝説の勇者（傳說勇者）"],[100,"N4 鬼退治の勇者"]];
 MILES.slice(1).forEach(([p,nm])=>ACH.push(["m"+p,nm.replace(/（.*）/,""),`N4 總進度達到 ${p}%`,"M5 21V4M5 4h11l-2 4 2 4H5"]));
-function progStat(){const t=today(),r={n:0,box:0,wip:0,need:0,td:0,k:{}};
+// 複習排程：第 1 次答對隔 1 天、第 2 次隔 3 天就「該複習」
+const REV_GAP=[0,1,3];
+function revState(key){const a=S.stamp[key]||[],t=today();if(S.box[key]||!a.length||a.length>=3)return a.includes(t)&&a.length>1?"revToday":a.includes(t)?"newToday":"";
+  if(a.includes(t))return a.length>1?"revToday":"newToday";
+  const gap=Math.round((P(t)-P(a[a.length-1]))/864e5);return gap>=REV_GAP[a.length]?"due":"wait"}
+const isDue=key=>revState(key)==="due";
+function progStat(){const t=today(),r={n:0,box:0,wip:0,need:0,td:0,fresh:0,newTd:0,revTd:0,due:0,k:{}};
   PKS.forEach(k=>{let n=0,b=0,w=0;BANK[k].forEach(x=>{const key=keyOf(k,x),a=S.stamp[key]||[];n++;
-    if(S.box[key])b++;else{if(a.length)w++;r.need+=3-Math.min(3,a.length)}if(a.includes(t))r.td++});
+    if(S.box[key])b++;else{if(a.length)w++;r.need+=3-Math.min(3,a.length)}if(a.includes(t))r.td++;
+    if(!a.length)r.fresh++;const rs=revState(key);if(rs==="newToday")r.newTd++;else if(rs==="revToday")r.revTd++;else if(rs==="due")r.due++});
     r.k[k]={n,b,w};r.n+=n;r.box+=b;r.wip+=w});return r}
 function renderJourney(){const r=progStat(),pct=r.n?r.box/r.n*100:0,pw=r.n?(r.box+r.wip)/r.n*100:0;
   $("jB").style.width=pct+"%";$("jW").style.width=pw+"%";
@@ -1770,13 +1788,14 @@ function renderJourney(){const r=progStat(),pct=r.n?r.box/r.n*100:0,pw=r.n?(r.bo
     if(!el){el=document.createElement("span");el.className="dunP";el.innerHTML='<span class="dunBar"><i></i></span><em></em>';d.appendChild(el)}
     if(k==="wrong"){const w=(S.wrong||[]).length;el.querySelector(".dunBar").style.display="none";el.querySelector("em").textContent=w?`還有 ${w} 隻鬼`:"目前沒有鬼";return}
     const s=r.k[k];if(!s)return;el.querySelector("i").style.width=(s.n?s.b/s.n*100:0)+"%";el.querySelector("em").textContent=`${s.b} / ${s.n}`});
-  // 考前配速：今天開始時還要蓋的章 ÷ 剩下天數
+  // 今日目標：新題（剩下沒碰過的 ÷ 天數，最後一週留給複習）＋複習（今天到期的）
   const left=Math.ceil((examDate()-new Date())/864e5),pace=$("jPace");
-  if(left<=0||r.box>=r.n){pace.classList.add("met");$("jToday").textContent=r.td;$("jGoal").textContent=r.td;$("jPaceBar").style.width="100%";$("jPaceTxt").textContent=r.box>=r.n?"題庫全部收服了，剩下就是保持手感。":"考試辛苦了！";}
-  else{const goal=Math.max(1,Math.ceil((r.need+r.td)/left)),met=r.td>=goal;
-    setNum("jToday",r.td);$("jGoal").textContent=goal;$("jPaceBar").style.width=Math.min(100,r.td/goal*100)+"%";pace.classList.toggle("met",met);
-    const fights=Math.max(1,Math.ceil(goal/8));
-    $("jPaceTxt").textContent=met?`今天達標了！明天也照這個速度，考前就能全部收服。`:`離考試 ${left} 天：每天蓋 ${goal} 個章（大約 ${fights} 場試煉）就趕得上，還差 ${goal-r.td} 個。`}
+  const row=(id,v,g,met)=>{const el=$(id);el.classList.toggle("met",met);el.querySelector(".pNum b").textContent=v;el.querySelector(".pNum em").textContent=g;el.querySelector(".pBar i").style.width=(g?Math.min(100,v/g*100):100)+"%"};
+  if(left<=0||r.box>=r.n){pace.classList.add("met");row("pNew",r.newTd,r.newTd,true);row("pRev",r.revTd,r.revTd,true);$("jPaceTxt").textContent=r.box>=r.n?"題庫全部收服了，剩下就是保持手感。":"考試辛苦了！";}
+  else{const ng=Math.min(r.fresh+r.newTd,Math.max(16,Math.ceil((r.fresh+r.newTd)/Math.max(1,left-7)))),rg=r.due+r.revTd,nm=r.newTd>=ng,rm=r.revTd>=rg,met=nm&&rm;
+    row("pNew",r.newTd,ng,nm);row("pRev",r.revTd,rg,rm);pace.classList.toggle("met",met);
+    const need=[];if(!nm)need.push(`新題 ${ng-r.newTd} 題`);if(!rm)need.push(`複習 ${rg-r.revTd} 題`);
+    $("jPaceTxt").textContent=met?(rg?"今天達標了！新題和複習都完成，明天繼續。":"今天達標了！目前沒有到期的複習，明天會有。"):`還差 ${need.join("、")}。每場試煉最多 4 題是到期的複習（題號旁會標「複習」）。`}
   // 里程碑
   MILES.slice(1).forEach(([p])=>{if(pct>=p&&!S.ach["m"+p]){achGet("m"+p);setTimeout(()=>FX.stamp("昇格",{cls:"combo",top:"30%"}),B?1900:200)}});
   // 連續天數
