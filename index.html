@@ -100,6 +100,45 @@ body.tab-lib .wrap.shell,body.tab-box .wrap.shell,body.tab-set .wrap.shell{paddi
 .libSel select{appearance:none;-webkit-appearance:none;width:100%;min-height:46px;font:inherit;font-size:15px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 34px 8px 12px;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23E06A55' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
 .libSel select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 @media (prefers-reduced-motion:reduce){#libChips button{transition:none}}
+
+/* ════ 小鬼吉祥物（SVG＋CSS 動畫，一直在動） ════ */
+#oniPal{display:flex;align-items:center;gap:6px;margin:-2px 0 -6px;padding:0 4px}
+.oniBtn{all:unset;flex:none;width:96px;height:96px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.oniSvg{width:100%;height:100%;overflow:visible}
+.oniSay{position:relative;flex:1;min-width:0;font-size:15px;line-height:1.5;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:10px 14px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.oniSay::before{content:"";position:absolute;left:-7px;top:50%;width:12px;height:12px;margin-top:-6px;background:inherit;border-left:1px solid var(--line);border-bottom:1px solid var(--line);transform:rotate(45deg)}
+.oniSay.pop{animation:oniPop .42s cubic-bezier(.22,1,.36,1)}
+@keyframes oniPop{from{transform:translateX(-8px) scale(.94);opacity:0}to{transform:none;opacity:1}}
+.oBob,.oBody,.oTail,.oArmL,.oArmR,.oPupils,.oEyes,.oShadow,.oHornL,.oHornR{transform-box:fill-box}
+.oBob{transform-origin:50% 100%;animation:oBob 2.6s ease-in-out infinite}
+@keyframes oBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.oShadow{transform-origin:50% 50%;animation:oShadow 2.6s ease-in-out infinite}
+@keyframes oShadow{0%,100%{transform:scaleX(1);opacity:1}50%{transform:scaleX(.82);opacity:.7}}
+.oBody{transform-origin:50% 100%;animation:oBreath 2.6s ease-in-out infinite}
+@keyframes oBreath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.025,.975)}}
+.oTail{transform-origin:0% 100%;animation:oTail 1.7s ease-in-out infinite}
+@keyframes oTail{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(14deg)}}
+.oArmL{transform-origin:100% 0%;animation:oArmL 2.6s ease-in-out infinite}
+.oArmR{transform-origin:0% 0%;animation:oArmR 5.2s ease-in-out infinite}
+@keyframes oArmL{0%,100%{transform:rotate(0)}50%{transform:rotate(10deg)}}
+@keyframes oArmR{0%,70%,100%{transform:rotate(0)}78%{transform:rotate(-60deg)}84%{transform:rotate(-40deg)}90%{transform:rotate(-60deg)}}
+.oEyes{transform-origin:50% 50%;animation:oBlink 4.4s infinite}
+@keyframes oBlink{0%,90%,100%{transform:scaleY(1)}93%,95%{transform:scaleY(.08)}}
+.oPupils{animation:oLook 7s ease-in-out infinite}
+@keyframes oLook{0%,30%,100%{transform:translate(0,0)}38%,52%{transform:translate(-3px,0)}60%,72%{transform:translate(3px,-1px)}}
+.oHornL,.oHornR{transform-origin:50% 100%}
+.oHappy{display:none}
+#oniPal.happy .oEyes{display:none}#oniPal.happy .oHappy{display:block}
+#oniPal.happy .oBob{animation:oHop .9s cubic-bezier(.3,0,.4,1) infinite}
+@keyframes oHop{0%,100%{transform:translateY(0)}45%{transform:translateY(-12px)}}
+#oniPal.sleepy .oEyes{transform:scaleY(.25);animation:none}
+#oniPal.sleepy .oBob{animation-duration:4s}
+.oniBtn.poke .oBob{animation:oPoke .6s cubic-bezier(.22,1,.36,1)}
+@keyframes oPoke{0%{transform:translateY(0) scale(1)}30%{transform:translateY(4px) scale(1.12,.86)}60%{transform:translateY(-18px) scale(.94,1.08)}100%{transform:translateY(0) scale(1)}}
+.oniBtn:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:50%}
+body.inBattle #oniPal{display:none}
+@media (prefers-reduced-motion:reduce){#oniPal *{animation:none!important}.oniSay.pop{animation:none}}
+@media (min-width:900px){#gameView>#oniPal{grid-column:1/-1;grid-row:auto}}
 </style></head><body>
 
 <title>タカラ勇者試煉</title>
@@ -926,6 +965,28 @@ body.inBattle #stageBg{opacity:.55;transform:none}
   <div id="gameView" class="wrap" style="max-width:none">
 
 
+  <section id="oniPal" aria-live="polite"><button type="button" class="oniBtn" id="oniBtn" aria-label="戳一下小鬼"><svg class="oniSvg" viewBox="0 0 120 120" aria-hidden="true">
+      <g class="oShadow"><ellipse cx="60" cy="112" rx="26" ry="4.5" fill="#000" opacity=".35"/></g>
+      <g class="oBob">
+        <g class="oTail"><path d="M84 86c14 2 20-6 22-14" fill="none" stroke="#1A1714" stroke-width="7" stroke-linecap="round"/><path d="M84 86c14 2 20-6 22-14" fill="none" stroke="#C8402F" stroke-width="4" stroke-linecap="round"/><path d="M106 72l-6-1 4-6 5 3z" fill="#1A1714"/></g>
+        <g class="oBody">
+          <g class="oHornL"><path d="M38 40c-6-10-4-22 2-28 0 10 6 16 10 22z" fill="#F4EFE3" stroke="#1A1714" stroke-width="3" stroke-linejoin="round"/></g>
+          <g class="oHornR"><path d="M82 40c6-10 4-22-2-28 0 10-6 16-10 22z" fill="#F4EFE3" stroke="#1A1714" stroke-width="3" stroke-linejoin="round"/></g>
+          <path d="M60 30c22 0 36 16 36 40 0 22-16 36-36 36S24 92 24 70c0-24 14-40 36-40z" fill="url(#oniG)" stroke="#1A1714" stroke-width="3.5"/>
+          <path d="M34 58c4-10 12-16 22-18" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".35"/>
+          <g class="oArmL"><path d="M27 80c-8 2-12 8-12 14" fill="none" stroke="#1A1714" stroke-width="7" stroke-linecap="round"/><path d="M27 80c-8 2-12 8-12 14" fill="none" stroke="#C8402F" stroke-width="4" stroke-linecap="round"/></g>
+          <g class="oArmR"><path d="M93 80c8 2 12 8 12 14" fill="none" stroke="#1A1714" stroke-width="7" stroke-linecap="round"/><path d="M93 80c8 2 12 8 12 14" fill="none" stroke="#C8402F" stroke-width="4" stroke-linecap="round"/></g>
+          <path class="oBrow" d="M40 54l12 4M80 54l-12 4" stroke="#1A1714" stroke-width="3.5" stroke-linecap="round"/>
+          <g class="oEyes"><circle cx="48" cy="66" r="8" fill="#fff" stroke="#1A1714" stroke-width="2.5"/><circle cx="72" cy="66" r="8" fill="#fff" stroke="#1A1714" stroke-width="2.5"/>
+            <g class="oPupils"><circle cx="49" cy="67" r="3.6" fill="#1A1714"/><circle cx="73" cy="67" r="3.6" fill="#1A1714"/></g></g>
+          <path class="oHappy" d="M41 68q7-8 14 0M65 68q7-8 14 0" fill="none" stroke="#1A1714" stroke-width="3.5" stroke-linecap="round"/>
+          <path class="oMouth" d="M48 84q12 9 24 0" fill="#7A1E14" stroke="#1A1714" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M51 85l3 5 3-4zM69 85l-3 5-3-4z" fill="#F4EFE3"/>
+          <circle cx="38" cy="78" r="4" fill="#F28C7A" opacity=".55"/><circle cx="82" cy="78" r="4" fill="#F28C7A" opacity=".55"/>
+        </g>
+      </g>
+      <defs><radialGradient id="oniG" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#EE7A5E"/><stop offset=".55" stop-color="#D2523C"/><stop offset="1" stop-color="#A8321F"/></radialGradient></defs>
+    </svg></button><div class="oniSay" id="oniSay">今天也來打幾場吧。</div></section>
   <section id="todayPlan" class="box" style="display:grid;gap:10px">
     <button type="button" class="planHead" id="planToggle" aria-expanded="true" aria-controls="planBody"><b style="font-size:17px">今日學習計畫</b><span class="planMini" id="planMini"></span><span class="tag" id="planWeek">—</span><svg class="planChev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
     <div class="planBody" id="planBody"><div class="planInner">
@@ -1127,7 +1188,7 @@ function render(){
   $("days").textContent=d;
   const lv=1+Math.floor(S.xp/100);setNum("lv",lv);
   $("xpbar").style.width=(S.xp%100)+"%";$("xptxt").textContent=`XP ${S.xp%100} / 100`;
-  setNum("streak",S.streak);renderWeek();try{renderJourney()}catch(e){}setNum("boxN",Object.keys(S.ach||{}).length);setNum("wrongN",S.wrong.length);
+  setNum("streak",S.streak);renderWeek();try{renderJourney()}catch(e){}try{oniUpdate()}catch(e){}setNum("boxN",Object.keys(S.ach||{}).length);setNum("wrongN",S.wrong.length);
   const wk=Math.ceil(d/7);
   $("plan").textContent=d>140?`第一階段打底（還有 ${wk} 週）：毎日（まいにち）單字＋文法各一場，こつこつ（一點一滴）來。`:d>56?`第二階段（還有 ${wk} 週）：每天加一場讀解或聽解，がんばって！`:`ラストスパート（最後衝刺，還有 ${wk} 週）：每天打ラスボス＋聽解。`;
   const ul=$("wrongList");
@@ -1806,6 +1867,21 @@ function planCheer(){const go=()=>{FX.stamp("制霸",{cls:"big",top:"34%"});cons
     const el=document.createElement("div");el.className="achPop";el.innerHTML='<span class="achIc" style="font-family:\'Yuji Syuku\',serif;font-size:26px">宝</span><div><small>今日の計画ぜんぶクリア！（今日計畫全部完成）</small><b>+30 XP</b><span>明天也來一下，連續天數 +1</span></div>';
     const pop=()=>{if(achBusy)return setTimeout(pop,400);achBusy=true;document.body.appendChild(el);requestAnimationFrame(()=>el.classList.add("on"));setTimeout(()=>{el.classList.remove("on");setTimeout(()=>{el.remove();achBusy=false;achShow()},450)},3000)};pop();try{render()}catch(e){}};
   setTimeout(go,B?2200:250)}
+
+// ── 小鬼吉祥物：依今天的狀態換表情和台詞，戳一下會跳 ──
+const ONI_POKE=["痛！幹嘛戳我，去背單字啦。","戳我不會加分喔。","你再戳，我就把你的錯題本吃掉。","おい！（喂！）手指拿去打試煉。","嘿嘿，今天的單字比我還可怕嗎？","我是鬼，但我比考試溫柔。"];
+function oniUpdate(){const pal=$("oniPal");if(!pal)return;const td=today(),y=new Date(Date.now()-864e5).toLocaleDateString("sv"),d=(S.done||{})[td]||{};
+  const n=Object.values(d).filter(Boolean).length,all=(S.allDone||{})[td],st=(S.last===td||S.last===y)?(S.streak||0):0,h=new Date().getHours();
+  let msg,mood="";
+  if(all){mood="happy";msg=st>1?`今天全部完成！連續 ${st} 天，鬼都佩服你。`:"今天全部完成！明天也要來找我喔。"}
+  else if(h>=23||h<5){mood="sleepy";msg=n?"好睏……剩下的明天早上再打也行。":"這麼晚還不睡？打一場就去睡吧。"}
+  else if(n){msg=`已經完成 ${n} 項了，再一下下！`}
+  else if(S.last===y&&st){msg=`連續 ${st} 天的紀錄在我手上，今天不打我就吃掉它。`}
+  else msg=["今天也來打幾場吧。","單字洞窟裡有人掉寶了，快去撿。","錯題本裡的鬼越養越肥了喔。"][new Date().getDate()%3];
+  pal.className=mood;const say=$("oniSay");if(say.dataset.m!==msg){say.dataset.m=msg;say.textContent=msg;say.classList.remove("pop");void say.offsetWidth;say.classList.add("pop")}}
+$("oniBtn").onclick=()=>{const b=$("oniBtn"),say=$("oniSay");b.classList.remove("poke");void b.offsetWidth;b.classList.add("poke");try{sfx("tap")}catch(e){}
+  const m=ONI_POKE[Math.random()*ONI_POKE.length|0];say.textContent=m;say.classList.remove("pop");void say.offsetWidth;say.classList.add("pop");
+  clearTimeout(b._t);b._t=setTimeout(()=>{$("oniSay").dataset.m="";oniUpdate()},3500)};
 
 renderDay();
 render();
