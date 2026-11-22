@@ -154,6 +154,7 @@ body.inBattle #oniPal{display:none}
 <meta name="application-name" content="勇者試煉">
 <meta name="theme-color" content="#161311">
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Yuji+Boku&family=IBM+Plex+Sans+JP:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <style>
 /* 清爽讀書卡：狀態列 → 四個關卡 → 答題卡 → 錯題本；字大、行距寬，好讀為主 */
@@ -590,6 +591,7 @@ html{scroll-behavior:smooth}
 
 #sakura{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
 .wrap.shell{position:relative;z-index:1}
+.wrap.shell>*{min-width:0}@media (max-width:899px){.wrap.shell>.wrap{width:100%}}#libView .card{overflow-wrap:anywhere}
 
 /* ── 這週日曆 ── */
 .week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-top:10px;max-width:520px;margin-left:auto;margin-right:auto}
@@ -737,6 +739,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;ba
 #setView{max-width:640px!important;margin:0 auto}
 .shareBtn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;border-radius:14px;font-weight:700;font-size:17px;background:var(--grad);border-color:transparent;color:#fff;text-align:center}
 .shareBtn.done{background:var(--ok)}
+.bkRow{display:grid;grid-template-columns:1fr 1fr;gap:8px}.bkRow button{min-height:44px;font-weight:700;text-align:center;justify-content:center}.bkApply{min-height:48px;font-weight:700;background:var(--grad);border-color:transparent;color:#fff}textarea.shareUrl{resize:vertical;word-break:break-all}
 .shareUrl{font:inherit;font-family:var(--mono);font-size:13px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--dim);width:100%}
 .ic{display:inline-block;vertical-align:-.18em;flex:none}
 .warn{display:inline-flex;align-items:center;gap:4px}
@@ -1063,10 +1066,19 @@ body.inBattle #stageBg{opacity:.55;transform:none}
       <p class="sub" id="examInfo"></p>
     </section>
     <section class="box setBox"><b class="setH">もぎしけん（模擬考）</b><div id="setMock" style="display:grid;gap:6px"></div><p class="sub">模擬考當天和前 3 天，首頁「今日學習計畫」會出現提醒。</p></section>
+    <section class="box setBox" id="bkBox"><b class="setH">バックアップ（備份進度）</b>
+      <p class="sub">進度只存在這台裝置。換手機、清瀏覽器前，先存一份備份。</p>
+      <div class="bkRow"><button type="button" id="bkSave">下載備份檔</button><button type="button" id="bkCopy">複製備份碼</button></div>
+      <div class="bkRow"><button type="button" id="bkLoad">讀取備份檔</button><button type="button" id="bkPasteBtn">貼上備份碼</button></div>
+      <input type="file" id="bkFile" accept=".json,application/json,text/plain" hidden>
+      <textarea id="bkPaste" class="shareUrl" rows="3" placeholder="把備份碼貼在這裡" aria-label="備份碼" hidden></textarea>
+      <p class="sub" id="bkMsg" aria-live="polite"></p>
+      <button type="button" id="bkApply" class="bkApply" hidden>確定還原（會蓋掉目前進度）</button>
+    </section>
     <section class="box setBox"><b class="setH">シェア（分享給朋友）</b>
       <button type="button" class="shareBtn" id="shareBtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7.5 7.5 4.5-4.5 4.5 4.5"/><path d="M5 12v6.5A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V12"/></svg><span id="shareTxt">分享連結</span></button>
-      <input class="shareUrl" id="shareUrl" readonly value="https://claude.ai/artifact/L3NQXkpBt7EGV3C1EG6Us1" aria-label="App 連結">
-      <p class="sub">朋友打開後，進度會存在他自己的手機裡；沒有登入 Claude 就不會跨裝置同步，其他功能都能用。</p>
+      <input class="shareUrl" id="shareUrl" readonly value="https://takara-nikki.github.io/hero-trial/" aria-label="App 連結">
+      <p class="sub">朋友打開後，進度存在他自己的手機裡。換手機前，記得先用上面的「備份進度」。</p>
     </section>
     
   </div>
@@ -1118,7 +1130,7 @@ const examStr=()=>((typeof S!=="undefined"&&S&&S.examDate)||"2027-07-04");
 const examDate=()=>new Date(examStr()+"T00:00:00+08:00");
 const $=id=>document.getElementById(id);
 const store={get(){try{return JSON.parse(localStorage.getItem("n4q"))||null}catch(e){return null}},set(s){try{localStorage.setItem("n4q",JSON.stringify(s))}catch(e){}}};
-let S=store.get()||{xp:0,streak:0,last:"",wrong:[]};S.miss=S.miss||{};S.mark=S.mark||{};S.stamp=S.stamp||{};S.box=S.box||{};
+let S=store.get()||{xp:0,streak:0,last:"",wrong:[]};S.miss=S.miss||{};S.mark=S.mark||{};S.stamp=S.stamp||{};S.box=S.box||{};S.missDay=S.missDay||{};
 // 日期徽章：同一題每天最多蓋一個，集滿三天收進寶物箱
 const today=()=>new Date().toLocaleDateString("sv");
 const md=d=>{const [,m,dd]=d.split("-");return (+m)+"/"+(+dd)};
@@ -1335,9 +1347,9 @@ const FX=(()=>{const reduce=matchMedia('(prefers-reduced-motion: reduce)').match
 function pick(btn,t){
   const q=B.qs[B.i];[...$("opts").children].forEach(b=>{b.disabled=true;if(b.textContent===q.ans)b.classList.add("ok")});
   if(t===q.ans){sfx("ok");achOk(true,q);B.combo=(B.combo||0)+1;FX.at(btn,{n:20,speed:4.5});FX.at($("sprite"),{n:22,speed:5,cols:["#1A1714","#C8402F","#B8862A","#F4EFE3"]});FX.shake($("sprite").parentNode,5);FX.buzz(20);FX.combo(B.combo);if(!RM())$("sprite").animate([{transform:"none",filter:"brightness(1)"},{transform:"translateX(-6px) rotate(-6deg)",filter:"brightness(2.2)"},{transform:"translateX(6px) rotate(5deg)",filter:"brightness(1.4)"},{transform:"none",filter:"brightness(1)"}],{duration:420,easing:"ease-out"});B.ok=(B.ok||0)+1;B.mon=Math.max(0,B.mon-B.hit);S.xp+=10;$("msg").textContent=["正解！（せいかい＝答對）","すごい！（好厲害）","やった！（太好了）","その調子！（就是這個節奏）","天才か？（是天才嗎？）"][Math.random()*5|0];
-    if(B.k==="wrong")S.wrong=S.wrong.filter(w=>w.q!==q.q);if(q.key&&stamp(q.key)===2&&(flyToBox(btn),sfx("chime"),1))$("msg").insertAdjacentHTML("beforeend",`<span class="gemMsg">${IC("gem")} 集滿三天，這題收進たからばこ（寶物箱）了！</span>`);}
+    if(B.k==="wrong")S.wrong=S.wrong.filter(w=>w.q!==q.q);if(q.key&&S.missDay[q.key]&&S.missDay[q.key]<today())delete S.missDay[q.key];if(q.key&&stamp(q.key)===2&&(flyToBox(btn),sfx("chime"),1))$("msg").insertAdjacentHTML("beforeend",`<span class="gemMsg">${IC("gem")} 集滿三天，這題收進たからばこ（寶物箱）了！</span>`);}
   else{sfx("ng");achOk(false,q);B.combo=0;FX.flash();FX.buzz(70);if(!RM())$("sprite").animate([{transform:"none"},{transform:"translateY(-16px) scale(1.12)"},{transform:"translateY(0) scale(.96)"},{transform:"none"}],{duration:520,easing:EASE});btn.classList.add("no");btn.classList.remove("shake");void btn.offsetWidth;btn.classList.add("shake");B.me=Math.max(0,B.me-15);$("msg").textContent=["あちゃー（哎呀）","えっ、マジ？（真的假的）","ドンマイ（別在意）","うそでしょ（不會吧）"][Math.random()*4|0]+" "+(q.t?q.t+" ":"")+"答案是「"+q.ans+"」，已收進まちがいノート。";
-    if(!S.wrong.some(w=>w.q===q.q))S.wrong.push(q);if(q.key){S.miss[q.key]=(S.miss[q.key]||0)+1;if(S.mark[q.key]==="ok")S.mark[q.key]="ng"}}
+    if(!S.wrong.some(w=>w.q===q.q))S.wrong.push(q);if(q.key){S.miss[q.key]=(S.miss[q.key]||0)+1;S.missDay[q.key]=today();if(S.mark[q.key]==="ok")S.mark[q.key]="ng"}}
   if(q.tr){$("note").hidden=false;$("note").textContent=(q.say?"原文："+q.say+"\n":"")+"翻譯："+q.tr+"\n說明："+q.note}
   if((q.voc&&q.rt)||q.k==="grammar")vsay(q,true);
   if(q.k==="grammar"&&q.key&&S.mark[q.key]==="pr"){const gx=G.find(y=>keyOf("grammar",y)===q.key);if(gx)setTimeout(()=>speak(String(gx[1]).replace("（　）",gx[2]),Math.max(.5,VO.rate*.8)),300)}
@@ -1365,9 +1377,9 @@ $("next").onclick=()=>{sfx("tap");const card=$("battle"),h0=card.offsetHeight;
 function end(){
   const today=new Date().toLocaleDateString("sv");const y=new Date(Date.now()-864e5).toLocaleDateString("sv");
   if(S.last!==today){S.streak=S.last===y?S.streak+1:1;S.last=today}
-  S.xp+=B.me>0?20:5;store.set(S);setTimeout(()=>sfx(B.me>0?"rin":"ng"),120);
-  const win=B.me>0,ok=B.ok||0,n=B.qs.length;
-  setTimeout(()=>{try{achEnd(win,ok,n,B.k,Date.now()-(B.t0||Date.now()))}catch(e){}},900);
+  const win=B.me>0,ok=B.ok||0,n=B.qs.length,bk=B.k,t0=B.t0||Date.now();
+  S.xp+=win?20:5;store.set(S);setTimeout(()=>sfx(win?"rin":"ng"),120);
+  setTimeout(()=>{try{achEnd(win,ok,n,bk,Date.now()-t0)}catch(e){}},900);
   if(B.k!=="wrong"&&n>=8){S.done=S.done||{};const td=new Date().toLocaleDateString("sv");(S.done[td]=S.done[td]||{})[B.k]=true;store.set(S);try{renderPlan()}catch(e){}}
   $("result").innerHTML=`<div class="rTitle">${win?"かった！":"まけた……"}</div><div class="rSub">${win?"（贏了）おつかれさま（辛苦了）！":"（輸了）ガーン……"}</div>
     <p class="rLine">${win?`打倒了 ${esc(MON[B.k])}`:"不過まちがいノート又變胖了，明天再來。"}</p>
@@ -1677,7 +1689,7 @@ function mergeS(a,b){a=a||{};b=b||{};const o=Object.assign({},a,b);
   if(!b.jpFrom&&a.jpFrom){o.jpFrom=a.jpFrom;o.jpDate=a.jpDate}
   return o}
 function mergeChats(a,b){const o={};for(const k in MATES){const x=(a||{})[k]||[],y=(b||{})[k]||[];o[k]=(y.length>=x.length?y:x).slice(-80)}return o}
-function applyS(n){S=n;S.miss=S.miss||{};S.mark=S.mark||{};S.stamp=S.stamp||{};S.box=S.box||{};S.wrong=S.wrong||[];
+function applyS(n){S=n;S.miss=S.miss||{};S.mark=S.mark||{};S.stamp=S.stamp||{};S.box=S.box||{};S.missDay=S.missDay||{};S.wrong=S.wrong||[];
   try{localStorage.setItem("n4q",JSON.stringify(S))}catch(e){}
   applying=true;try{render();try{renderPlan()}catch(e){}renderDay();if(!$("libView").hidden)renderLib();if(!$("boxView").hidden)renderBox()}finally{applying=false}}
 function pushProgress(){if(!cloud)return;clearTimeout(cloudTimer);syncTag("同步中…",1);cloudTimer=setTimeout(writeProgress,1200)}
@@ -1828,8 +1840,10 @@ const MILES=[[0,"見習い勇者（見習勇者）"],[10,"駆け出し勇者（�
 MILES.slice(1).forEach(([p,nm])=>ACH.push(["m"+p,nm.replace(/（.*）/,""),`N4 總進度達到 ${p}%`,"M5 21V4M5 4h11l-2 4 2 4H5"]));
 // 複習排程：第 1 次答對隔 1 天、第 2 次隔 3 天就「該複習」
 const REV_GAP=[0,1,3];
-function revState(key){const a=S.stamp[key]||[],t=today();if(S.box[key]||!a.length||a.length>=3)return a.includes(t)&&a.length>1?"revToday":a.includes(t)?"newToday":"";
+function revState(key){const a=S.stamp[key]||[],t=today(),m=S.missDay[key];
   if(a.includes(t))return a.length>1?"revToday":"newToday";
+  if(m&&m<t)return "due";
+  if(S.box[key]||!a.length||a.length>=3)return "";
   const gap=Math.round((P(t)-P(a[a.length-1]))/864e5);return gap>=REV_GAP[a.length]?"due":"wait"}
 const isDue=key=>revState(key)==="due";
 function progStat(){const t=today(),r={n:0,box:0,wip:0,need:0,td:0,fresh:0,newTd:0,revTd:0,due:0,k:{}};
@@ -1915,7 +1929,7 @@ document.addEventListener("click",e=>{if(!window._pdIn||!document.body.classList
   const set=c=>{box.classList.toggle("closed",c);btn.setAttribute("aria-expanded",String(!c));try{localStorage.setItem("n4plan",c?"1":"0")}catch(e){}};
   set(closed);btn.onclick=()=>set(!box.classList.contains("closed"))})();
 // ── 分享連結：手機叫出分享選單，不行就複製 ──
-(()=>{const b=$("shareBtn");if(!b)return;const url=$("shareUrl").value,t=$("shareTxt");
+(()=>{const b=$("shareBtn");if(!b)return;const url=/^https?:$/.test(location.protocol)&&/github\.io$/.test(location.hostname)?location.origin+location.pathname:$("shareUrl").value;$("shareUrl").value=url;const t=$("shareTxt");
   const done=msg=>{t.textContent=msg;b.classList.add("done");setTimeout(()=>{t.textContent="分享連結";b.classList.remove("done")},2200)};
   const copy=async()=>{try{await navigator.clipboard.writeText(url);done("已複製連結");return}catch(e){}
     const i=$("shareUrl");i.focus();i.select();try{document.execCommand("copy");done("已複製連結")}catch(e){done("請長按上面的連結複製")}};
@@ -1937,4 +1951,28 @@ document.addEventListener("click",e=>{if(!window._pdIn||!document.body.classList
 
 
 <div class="rotLock" aria-live="polite"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg><div>請把手機轉回直的<small>勇者試煉只能直式遊玩</small></div></div>
+<script>
+/* ── 進度備份：匯出／匯入 ── */
+(()=>{const KEYS=["n4q","n4voice","n4sfx","n4chat2","n4plan"],msg=t=>{$("bkMsg").textContent=t};let pend=null;
+  const pack=()=>{const d={};KEYS.forEach(k=>{try{const v=localStorage.getItem(k);if(v!=null)d[k]=v}catch(e){}});return{app:"hero-trial",v:1,at:new Date().toISOString(),d}};
+  const enc=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o))));
+  const dec=t=>{t=String(t||"").trim();if(!t)throw 0;let o;try{o=JSON.parse(t)}catch(e){o=JSON.parse(decodeURIComponent(escape(atob(t.replace(/\s+/g,"")))))}
+    if(!o||o.app!=="hero-trial"||!o.d||!o.d.n4q)throw 0;const q=JSON.parse(o.d.n4q);if(!q||typeof q!=="object")throw 0;return{o,q}};
+  const ready=t=>{try{const{o,q}=dec(t);pend=o;const n=Object.keys(q.box||{}).length;
+      msg(`找到備份（${(o.at||"").slice(0,10)||"日期不明"}）：XP ${q.xp||0}、收服 ${n} 題、連續 ${q.streak||0} 天。`);$("bkApply").hidden=false}
+    catch(e){pend=null;$("bkApply").hidden=true;msg("讀不懂這份備份，請確認是從這個 App 匯出的。")}};
+  $("bkSave").onclick=()=>{const o=pack(),b=new Blob([JSON.stringify(o)],{type:"application/json"}),a=document.createElement("a");
+    a.href=URL.createObjectURL(b);a.download=`勇者試煉-備份-${today()}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);msg("備份檔已下載，請存到雲端硬碟或傳給自己。")};
+  $("bkCopy").onclick=async()=>{const c=enc(pack());try{await navigator.clipboard.writeText(c);msg("備份碼已複製，貼到記事本或傳給自己保存。")}
+    catch(e){const ta=$("bkPaste");ta.hidden=false;ta.value=c;ta.select();msg("無法自動複製，請手動複製上面這段備份碼。")}};
+  $("bkLoad").onclick=()=>$("bkFile").click();
+  $("bkFile").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(ready);e.target.value=""};
+  $("bkPasteBtn").onclick=()=>{const ta=$("bkPaste");if(ta.hidden||!ta.value.trim()){ta.hidden=false;ta.value="";ta.focus();msg("貼上備份碼後，再按一次「貼上備份碼」。")}else ready(ta.value)};
+  $("bkApply").onclick=function(){if(!pend)return;if(!this.dataset.c){this.dataset.c=1;this.textContent="真的要覆蓋嗎？再按一次";setTimeout(()=>{delete this.dataset.c;this.textContent="確定還原（會蓋掉目前進度）"},4000);return}
+    try{KEYS.forEach(k=>{if(pend.d[k]!=null)localStorage.setItem(k,pend.d[k]);else localStorage.removeItem(k)})}catch(e){msg("還原失敗：這台裝置的儲存空間不足。");return}
+    msg("還原完成，重新載入中…");setTimeout(()=>location.reload(),400)};
+})();
+/* ── 離線快取 ── */
+if("serviceWorker"in navigator&&location.protocol==="https:"&&/github\.io$/.test(location.hostname))addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+</script>
 </body></html>
