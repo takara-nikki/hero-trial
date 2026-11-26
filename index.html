@@ -67,8 +67,8 @@
 @media (prefers-reduced-motion:reduce){.pBar i{transition:none}}
 .jHelp{font-size:12.5px;color:var(--dim);margin:0}
 .dunP{position:relative;z-index:2;display:flex;align-items:center;gap:8px;margin-top:8px}
-.dunBar{position:relative;flex:1;height:6px;border-radius:99px;background:rgba(242,236,228,.14);overflow:hidden}.dunBar i.w{position:absolute;inset:0 auto 0 0;background:color-mix(in srgb,var(--accent) 45%,transparent)}.dunBar i:not(.w){position:relative}
-.dunW{position:relative;z-index:2;display:block;margin-top:4px;font-size:12px;color:var(--dim)}.dunW{font-family:var(--body);white-space:nowrap}
+.dunBar{position:relative;flex:1;height:6px;border-radius:99px;background:rgba(242,236,228,.14);overflow:hidden}.dunBar i.w{position:absolute;inset:0 auto 0 0}.dunBar i:not(.w){position:relative;background:var(--gold)}
+.dunW{position:relative;z-index:2;display:block;margin-top:4px;font-size:12px;color:var(--dim)}.dunW{font-family:var(--body);white-space:nowrap}.dunStar{color:var(--gold)}
 .dunBar i{display:block;height:100%;border-radius:inherit;background:var(--grad);transition:width .9s cubic-bezier(.22,1,.36,1)}
 .dunP em{font-style:normal;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:12px;color:var(--ink);opacity:.85;white-space:nowrap}
 .kpi.streak b{font-family:var(--mono)}
@@ -543,7 +543,7 @@ body.inBattle #battle{display:flex;flex-direction:column;gap:10px;padding:14px 1
 #battle #monName{font-size:14px;color:var(--dim)}
 #battle .q{margin:4px 0 0!important;font-size:22px!important;line-height:1.6}
 #battle .passage{padding:10px 12px;font-size:15.5px!important;line-height:1.7;max-height:34vh;overflow:auto}
-#battle #play{align-self:flex-start;padding:8px 14px;min-height:40px}
+#battle #play{align-self:flex-start;padding:8px 14px;min-height:40px}#skipL{align-self:flex-start;padding:6px 12px;min-height:36px;font-size:13px;color:var(--dim);background:transparent}
 #battle .opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 #battle .opts button{font-size:18px!important;padding:12px 12px!important;min-height:52px;text-align:center}
 #battle .msg{margin:0!important;font-size:15px;min-height:0}
@@ -1026,6 +1026,7 @@ body.inBattle #stageBg{opacity:.55;transform:none}
     <div class="q" id="q"></div>
     <div class="row vsay" id="vsay" hidden style="justify-content:flex-start;gap:10px;margin:-4px 0 8px"></div>
     <button id="play" hidden>▶ きいて！（聽聽看）</button>
+    <button id="skipL" hidden>聽力先跳過</button>
     <div class="opts" id="opts"></div>
     <p class="msg" id="msg"></p>
     <div class="fb" id="fb" hidden><div class="fbHead"><span class="fbIc" id="fbIc"></span><b id="fbTitle"></b></div><p class="fbLine" id="fbLine"></p><div class="passage" id="note" hidden></div></div>
@@ -1267,7 +1268,7 @@ function show(){
   const q=B.qs[B.i];$("qn").textContent=`${B.i+1}/${B.qs.length}`+(q.rv?" · 複習":"");
   $("passage").hidden=!q.p;$("passage").textContent=q.p||"";
   $("q").innerHTML=q.q.replace(/\n/g,"<br>");
-  $("note").hidden=true;$("play").hidden=!q.say;$("msg").textContent=q.say?"先按「きいて」，耳朵準備好再選。":"";$("next").hidden=true;
+  $("note").hidden=true;$("play").hidden=!q.say;$("skipL").hidden=!(q.say&&B.k==="wrong");$("msg").textContent=q.say?"先按「きいて」，耳朵準備好再選。":"";$("next").hidden=true;
   vsay(q,false);
   try{document.activeElement&&document.activeElement.blur()}catch(e){}
   const o=$("opts");o.innerHTML="";
@@ -1309,6 +1310,11 @@ function speak(t,rateOv){try{speechSynthesis.cancel();
   if(speechSynthesis.paused)speechSynthesis.resume();
 }catch(e){$("msg").textContent="這個瀏覽器不能播放語音，原文："+t}}
 $("play").onclick=()=>speak(B.qs[B.i].say);
+/* 錯題本：不方便出聲時，聽力題先跳過（不算錯，留在錯題本，下次還會出現） */
+$("skipL").onclick=()=>{if(!B||$("next").hidden===false)return;try{speechSynthesis.cancel()}catch(e){}
+  const pool=shuffle(S.wrong.filter(w=>!w.say&&!B.qs.some(x=>x.q===w.q)));
+  if(pool.length)B.qs[B.i]=pool[0];else{B.qs.splice(B.i,1);if(!B.qs.length){leave();flash("錯題本裡剩下的都是聽力題，等方便出聲時再來打。");return}if(B.i>=B.qs.length){end();return}}
+  show()};
 $("check").onclick=()=>{if(!B||!B.sel)return;const [b,t]=B.sel;b.classList.remove("sel");sfx("tap");setTimeout(()=>{const cur=B,right=t===B.qs[B.i].ans;pick(b,t)},90)};
 // 單字題的小喇叭：意思題出題就能聽；讀音題答完才出現（先聽就洩答案）。出現時自動念一次單字。
 const SPK='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
@@ -1392,7 +1398,7 @@ function end(){
   if(!RM())$("result").animate([{transform:"translateY(24px)",opacity:0},{transform:"none",opacity:1}],{duration:520,easing:EASE});
   setTimeout(()=>{FX.stamp(win?"勝":"負",{cls:"big",top:"34%"});const rt=$("result").querySelector(".rTitle");if(rt)FX.at(rt,{n:30,speed:6})},380);
   {const bs=$("result").querySelectorAll(".rStats b");if(bs[0])FX.roll(bs[0],ok,800,700,"/"+n);if(bs[1])FX.roll(bs[1],win?20:5,700,860);if(bs[1]&&!FX.reduce)setTimeout(()=>{bs[1].textContent="+"+(win?20:5)},1700)}
-  $("opts").innerHTML="";$("passage").hidden=true;$("note").hidden=true;$("play").hidden=true;$("vsay").hidden=true;$("msg").textContent="";$("next").hidden=true;render();
+  $("opts").innerHTML="";$("passage").hidden=true;$("note").hidden=true;$("play").hidden=true;$("skipL").hidden=true;$("vsay").hidden=true;$("msg").textContent="";$("next").hidden=true;render();
 }
 function leave(){try{speechSynthesis.cancel()}catch(e){}document.body.classList.remove("inBattle");$("battle").classList.remove("ended");$("result").hidden=true;$("battle").hidden=true;$("home").hidden=false;B=null;render()}
 $("quit").onclick=leave;$("runBtn").onclick=e=>{e.stopPropagation();leave()};
@@ -1869,8 +1875,8 @@ function renderJourney(){const r=progStat(),pct=r.n?r.box/r.n*100:0,pw=r.n?(r.bo
   document.querySelectorAll("#home .dun").forEach(d=>{const k=d.dataset.k;let el=d.querySelector(".dunP");
     if(!el){el=document.createElement("span");el.className="dunP";el.innerHTML='<span class="dunBar"><i class="w"></i><i></i></span><em></em>';d.appendChild(el);const wl=document.createElement("small");wl.className="dunW";wl.hidden=true;d.appendChild(wl)}
     if(k==="wrong"){const w=(S.wrong||[]).length;el.querySelector(".dunBar").style.display="none";el.querySelector("em").textContent=w?`還有 ${w} 隻鬼`:"目前沒有鬼";return}
-    const s=r.k[k];if(!s)return;el.querySelector("i:not(.w)").style.width=(s.n?s.b/s.n*100:0)+"%";el.querySelector("i.w").style.width=(s.n?(s.b+s.w)/s.n*100:0)+"%";el.querySelector("em").textContent=`${s.b} / ${s.n}`;
-    /* 單次答對也看得到：練習中＝答對過但還沒滿 3 天 */const wl=d.querySelector(".dunW");if(wl){wl.hidden=!s.w;wl.textContent=s.w?`練習中 ${s.w} 題`:""}});
+    const s=r.k[k];if(!s)return;/* 主數字＝答對過的題數（答對一次就 +1）；金色＝收服（不同天答對 3 次） */el.querySelector("i:not(.w)").style.width=(s.n?s.b/s.n*100:0)+"%";el.querySelector("i.w").style.width=(s.n?(s.b+s.w)/s.n*100:0)+"%";el.querySelector("em").textContent=`${s.b+s.w} / ${s.n}`;
+    /* 單次答對也看得到：練習中＝答對過但還沒滿 3 天 */const wl=d.querySelector(".dunW");if(wl){wl.hidden=!(s.b+s.w);wl.innerHTML=s.b+s.w?`<span class="dunStar">★</span> 收服 ${s.b}`:""}});
   // 今日目標：新題（剩下沒碰過的 ÷ 天數，最後一週留給複習）＋複習（今天到期的）
   const left=Math.ceil((examDate()-new Date())/864e5),pace=$("jPace");
   const row=(id,v,g,met)=>{const el=$(id);el.classList.toggle("met",met);el.querySelector(".pNum b").textContent=v;el.querySelector(".pNum em").textContent=g;el.querySelector(".pBar i").style.width=(g?Math.min(100,v/g*100):100)+"%"};
