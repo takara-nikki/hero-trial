@@ -850,6 +850,7 @@ body.inBattle #gameView{width:100%!important;max-width:100%!important;box-sizing
 @media (max-width:899px){.wrap.shell{grid-template-columns:minmax(0,1fr)}}
 #battle>*{min-width:0;max-width:100%}
 #battle .q,#battle .msg,#battle #note{overflow-wrap:anywhere}
+.gp{color:var(--gold);font-weight:700}
 /* 作答時：整個畫面底圖換成那一關的水墨風景（櫻花照樣在上面飄） */
 #stageBg{position:fixed;left:0;right:0;bottom:0;top:auto;height:auto;aspect-ratio:1391/1131;z-index:-1;pointer-events:none;opacity:0;transform:translateY(40px);transition:opacity 1.1s cubic-bezier(.22,1,.36,1),transform 1.3s cubic-bezier(.22,1,.36,1);
   background-repeat:no-repeat;background-position:center bottom;background-size:100% auto;
@@ -1350,7 +1351,7 @@ function pick(btn,t){
     if(B.k==="wrong")S.wrong=S.wrong.filter(w=>w.q!==q.q);if(q.key&&S.missDay[q.key]&&S.missDay[q.key]<today())delete S.missDay[q.key];if(q.key&&stamp(q.key)===2&&(flyToBox(btn),sfx("chime"),1))$("msg").insertAdjacentHTML("beforeend",`<span class="gemMsg">${IC("gem")} 集滿三天，這題收進たからばこ（寶物箱）了！</span>`);}
   else{sfx("ng");achOk(false,q);B.combo=0;FX.flash();FX.buzz(70);if(!RM())$("sprite").animate([{transform:"none"},{transform:"translateY(-16px) scale(1.12)"},{transform:"translateY(0) scale(.96)"},{transform:"none"}],{duration:520,easing:EASE});btn.classList.add("no");btn.classList.remove("shake");void btn.offsetWidth;btn.classList.add("shake");B.me=Math.max(0,B.me-15);$("msg").textContent=["あちゃー（哎呀）","えっ、マジ？（真的假的）","ドンマイ（別在意）","うそでしょ（不會吧）"][Math.random()*4|0]+" "+(q.t?q.t+(/[。！？!?，、]$/.test(q.t)?"":"，"):"")+"答案是「"+q.ans+"」，已收進まちがいノート。";
     if(!S.wrong.some(w=>w.q===q.q))S.wrong.push(q);if(q.key){S.miss[q.key]=(S.miss[q.key]||0)+1;S.missDay[q.key]=today();if(S.mark[q.key]==="ok")S.mark[q.key]="ng"}}
-  if(q.tr){$("note").hidden=false;$("note").textContent=(q.say?"原文："+q.say+"\n":"")+"翻譯："+q.tr+"\n說明："+q.note}
+  if(q.tr){$("note").hidden=false;$("note").innerHTML=esc((q.say?"原文："+q.say+"\n":"")+"翻譯："+q.tr+"\n說明：")+(q.k==="grammar"?gHi(q.note):esc(q.note))}
   if((q.voc&&q.rt)||q.k==="grammar")vsay(q,true);
   if(q.k==="grammar"&&q.key&&S.mark[q.key]==="pr"){const gx=G.find(y=>keyOf("grammar",y)===q.key);if(gx)setTimeout(()=>speak(String(gx[1]).replace("（　）",gx[2]),Math.max(.5,VO.rate*.8)),300)}
   $("monHp").style.width=B.mon+"%";$("myHp").style.width=B.me+"%";
@@ -1400,6 +1401,11 @@ $("clearW").onclick=function(){if(this.dataset.c){S.wrong=[];store.set(S);render
 const KN={vocab:"單字",grammar:"文法",reading:"讀解",listen:"聽解"};
 let libK="vocab";
 function esc(t){return String(t).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]))}
+/* 文法重點上色：開頭「句型＝意思」、「」裡的句型、「〇形＋〜」接續公式 */
+function gHi(note){let h=esc(note);
+  h=h.replace(/([^\s，。、；：「」（）]*形[^\s，。、；：「」（）]*＋[^\s，。、；：「」（）]+)/g,'<b class="gp">$1</b>');
+  h=h.replace(/「([^「」<>]*[ぁ-ヿ〜～][^「」<>]*)」/g,'「<b class="gp">$1</b>」');
+  return h.replace(/^([^。<]*＝[^。<]*)/,'<b class="gp">$1</b>')}
 let libSub="",libQ="",libSt="none";
 const ST={none:"待整理",ng:"不記得",pr:"發音不熟",ok:"記熟了",miss:"考試錯過",box:"寶物箱","":"全部"};
 // 有蓋章但沒標記的：今天蓋的先藏起來，明天起算「記熟了」
@@ -1439,7 +1445,7 @@ function renderLib(){
       h+=`<div class="row"><button class="sayBtn" data-say="${esc(q.say||q.p)}">▶ きいて</button></div>`;
       h+=`<div class="q">${esc(q.q)}</div><div class="reveal"><div class="ansline">こたえ（答案）：${esc(q.ans)}</div>`;
       if(q.say)h+=`<div class="passage" style="margin-top:6px">原文：${esc(q.say)}</div>`;
-      h+=`<div class="passage" style="margin-top:6px">翻譯：${esc(q.tr)}\n說明：${esc(q.note)}</div></div>`;
+      h+=`<div class="passage" style="margin-top:6px">翻譯：${esc(q.tr)}\n說明：${q.k==="grammar"?gHi(q.note):esc(q.note)}</div></div>`;
     }
     if(ms)c.classList.add("missed");if(mk==="ng"||mk==="pr")c.classList.add("open");
     c.innerHTML=`<div class="cardIn"><div style="min-width:0;display:grid;gap:6px">${(ms||mk?top:"")+h+marks}</div>${badges(key)}</div>`;if(S.box[key])c.classList.add("boxed");c.onclick=e=>{const b=e.target.closest(".sayBtn");if(b){e.stopPropagation();return speak(b.dataset.say)}
