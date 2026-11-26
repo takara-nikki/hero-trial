@@ -67,7 +67,8 @@
 @media (prefers-reduced-motion:reduce){.pBar i{transition:none}}
 .jHelp{font-size:12.5px;color:var(--dim);margin:0}
 .dunP{position:relative;z-index:2;display:flex;align-items:center;gap:8px;margin-top:8px}
-.dunBar{flex:1;height:6px;border-radius:99px;background:rgba(242,236,228,.14);overflow:hidden}
+.dunBar{position:relative;flex:1;height:6px;border-radius:99px;background:rgba(242,236,228,.14);overflow:hidden}.dunBar i.w{position:absolute;inset:0 auto 0 0;background:color-mix(in srgb,var(--accent) 45%,transparent)}.dunBar i:not(.w){position:relative}
+.dunW{position:relative;z-index:2;display:block;margin-top:4px;font-size:12px;color:var(--dim)}.dunW{font-family:var(--body);white-space:nowrap}
 .dunBar i{display:block;height:100%;border-radius:inherit;background:var(--grad);transition:width .9s cubic-bezier(.22,1,.36,1)}
 .dunP em{font-style:normal;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:12px;color:var(--ink);opacity:.85;white-space:nowrap}
 .kpi.streak b{font-family:var(--mono)}
@@ -1866,9 +1867,10 @@ function renderJourney(){const r=progStat(),pct=r.n?r.box/r.n*100:0,pw=r.n?(r.bo
   $("jNext").innerHTML=nx?`再收服 <b>${Math.ceil(nx[0]/100*r.n)-r.box}</b> 題，升級成「${nx[1].replace(/（.*）/,"")}」`:"全部收服！你就是 N4 鬼退治の勇者。";
   // 各關卡小進度條
   document.querySelectorAll("#home .dun").forEach(d=>{const k=d.dataset.k;let el=d.querySelector(".dunP");
-    if(!el){el=document.createElement("span");el.className="dunP";el.innerHTML='<span class="dunBar"><i></i></span><em></em>';d.appendChild(el)}
+    if(!el){el=document.createElement("span");el.className="dunP";el.innerHTML='<span class="dunBar"><i class="w"></i><i></i></span><em></em>';d.appendChild(el);const wl=document.createElement("small");wl.className="dunW";wl.hidden=true;d.appendChild(wl)}
     if(k==="wrong"){const w=(S.wrong||[]).length;el.querySelector(".dunBar").style.display="none";el.querySelector("em").textContent=w?`還有 ${w} 隻鬼`:"目前沒有鬼";return}
-    const s=r.k[k];if(!s)return;el.querySelector("i").style.width=(s.n?s.b/s.n*100:0)+"%";el.querySelector("em").textContent=`${s.b} / ${s.n}`});
+    const s=r.k[k];if(!s)return;el.querySelector("i:not(.w)").style.width=(s.n?s.b/s.n*100:0)+"%";el.querySelector("i.w").style.width=(s.n?(s.b+s.w)/s.n*100:0)+"%";el.querySelector("em").textContent=`${s.b} / ${s.n}`;
+    /* 單次答對也看得到：練習中＝答對過但還沒滿 3 天 */const wl=d.querySelector(".dunW");if(wl){wl.hidden=!s.w;wl.textContent=s.w?`練習中 ${s.w} 題`:""}});
   // 今日目標：新題（剩下沒碰過的 ÷ 天數，最後一週留給複習）＋複習（今天到期的）
   const left=Math.ceil((examDate()-new Date())/864e5),pace=$("jPace");
   const row=(id,v,g,met)=>{const el=$(id);el.classList.toggle("met",met);el.querySelector(".pNum b").textContent=v;el.querySelector(".pNum em").textContent=g;el.querySelector(".pBar i").style.width=(g?Math.min(100,v/g*100):100)+"%"};
