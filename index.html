@@ -1305,7 +1305,12 @@ $("vSel").onchange=e=>{VO.name=e.target.value;saveVO();fillVoices()};
 $("vRate").oninput=e=>{VO.rate=+e.target.value;$("vRateTxt").textContent=VO.rate.toFixed(2);saveVO()};
 $("vTest").onclick=()=>speak("こんにちは、タカラさん。今日も日本語をがんばりましょう。");
 function genderVoice(g){const vs=jaVoices();const re=g==="m"?/hattori|otoya|keita|ichiro|male|男/i:/o-?ren|kyoko|nanami|haruka|female|女/i;return vs.find(v=>re.test(v.name))||null}
-function speak(t,rateOv){try{speechSynthesis.cancel();
+/* 唸法修正：只改「念出來的字」，畫面不變。日文語音容易念錯的多音字，換成假名念 */
+const SAYFIX=[[/^毛$/,"け"],[/^米$|(?<=い)米/g,"こめ"],[/鶏肉/g,"とりにく"],[/この辺(?!り)|^辺$/g,m=>m.replace("辺","へん")],[/辛い/g,"からい"],[/汚す/g,"よごす"],[/夜中/g,"よなか"],[/大分/g,"だいぶ"],[/過ぎる/g,"すぎる"],
+  [/(歩いて|大体|だいたい|約)十分/g,"$1じゅっぷん"],[/何時間/g,"なんじかん"],[/何時/g,"なんじ"],[/何分/g,"なんぷん"],[/何で(?=行|旅行|名前|書)/g,"なにで"],[/今日中/g,"きょうじゅう"],[/角(?=を)/g,"かど"],
+  [/(?<=[のた])後/g,"あと"],[/(?<=る)間(?=に)/g,"あいだ"],[/開い(?=[たて])/g,"あい"],[/一日(?=[でに])/g,"いちにち"]];
+const sayFix=t=>SAYFIX.reduce((s,[r,v])=>s.replace(r,v),String(t));
+function speak(t,rateOv){try{speechSynthesis.cancel();t=sayFix(t);
   // 對話：「男：」「女：」開頭的行用男聲／女聲；（ ）括號說明不念
   const base=pickVoice(),vm=genderVoice("m"),vf=genderVoice("f");
   String(t).split("\n").forEach(line=>{line=line.trim();if(!line||line.startsWith("（"))return;
