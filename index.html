@@ -1327,7 +1327,7 @@ const SPK='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="c
 function vsay(q,done){const el=$("vsay");
   // 各題型的小喇叭：[念的內容, 標籤]；會洩答案的要答完才出現
   let btns=[],auto=null;
-  if(q.voc){if(q.rt&&!done)btns=[];else{btns=[[q.voc.r,"単語"],[q.voc.ex,"例文"]];if(!done||q.rt)auto=q.voc.r}}
+  if(q.voc){if(q.rt&&!done)btns=[];else{btns=[[q.voc.w||q.voc.r,"単語"],[q.voc.ex,"例文"]];if(!done||q.rt)auto=q.voc.w||q.voc.r}}
   else if(q.k==="grammar"){if(done)btns=[[String(q.q).replace("（　）",q.ans).replace(/<[^>]+>/g,""),"例文"]]}
   else if(q.k==="reading"){btns=[[q.p,"文章"],[q.q,"問題"]]}
   if(!btns.length){el.hidden=true;el.innerHTML="";return}
@@ -1447,7 +1447,7 @@ function renderLib(){
     const top=`<div class="row" style="justify-content:flex-start;gap:6px">${ms?`<span class="warn">${IC("warn",14)} 考試錯過 ${ms} 次</span>`:""}${mk==="ok"?'<span class="st ok">記熟了</span>':mk==="ng"?'<span class="st ng">不記得</span>':mk==="pr"?'<span class="st pr">發音不熟</span>':""}</div>`;
     const marks=`<div class="row" style="justify-content:flex-start;gap:8px"><button class="markBtn${mk==="ok"?" on":""}" data-v="ok">覚えた（記熟了）</button><button class="markBtn ng${mk==="ng"?" on":""}" data-v="ng">まだ（不記得）</button><button class="markBtn pr${mk==="pr"?" on":""}" data-v="pr">発音（發音不熟）</button></div>`;
     if(libK==="vocab"){
-      h=`<span class="lab">${esc(x[7])}</span><div class="row" style="justify-content:flex-start;gap:12px"><button class="sayBtn" data-say="${esc(x[1])}" aria-label="播放單字">▶</button><b style="font-size:22px">${esc(x[0])}</b><span class="reveal" style="color:var(--accent)">${x[0]!==x[1]?esc(x[1])+"・":""}${esc(x[2])}</span></div>`;
+      h=`<span class="lab">${esc(x[7])}</span><div class="row" style="justify-content:flex-start;gap:12px"><button class="sayBtn" data-say="${esc(x[0])}" aria-label="播放單字">▶</button><b style="font-size:22px">${esc(x[0])}</b><span class="reveal" style="color:var(--accent)">${x[0]!==x[1]?esc(x[1])+"・":""}${esc(x[2])}</span></div>`;
       h+=`<div class="row" style="justify-content:flex-start;gap:10px;flex-wrap:nowrap"><button class="sayBtn" data-say="${esc(x[3])}" aria-label="播放例句">▶</button><div style="min-width:0">${esc(x[3])}</div></div><div class="reveal passage">翻譯：${esc(x[4])}\n說明：${esc(x[5])}</div>`;
     }else if(libK==="grammar"){
       h=`<div class="row" style="justify-content:flex-start;gap:12px"><button class="sayBtn" data-say="${esc(x[1].replace("（　）",x[2]))}" aria-label="播放例句">▶</button><b style="font-size:20px">${esc(x[10]||x[0])}</b>${x[10]&&S.box[key]?`<span class="sub">辭書形：${esc(x[0])}</span>`:""}<span class="reveal" style="color:var(--accent)">${esc(x[8])}</span></div>`;
