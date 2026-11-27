@@ -1817,6 +1817,11 @@ document.querySelectorAll("#home .art").forEach(im=>{if(im.dataset.night)im.setA
 
 // ── 和風音效（Web Audio 合成，不用音檔）──
 const SFX={on:true,vol:.6};try{Object.assign(SFX,JSON.parse(localStorage.getItem("n4sfx"))||{})}catch(e){}
+/* iPhone 靜音鍵開著也要有音效：把音訊類型設成「播放」（iOS 17+）；舊版 iOS 第一次點擊時播一段無聲音檔來切換 */
+try{if(navigator.audioSession)navigator.audioSession.type="playback"}catch(e){}
+{const unlock=()=>{removeEventListener("pointerdown",unlock,true);try{if(navigator.audioSession)navigator.audioSession.type="playback"}catch(e){}
+  try{const a=new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=");a.setAttribute("playsinline","");a.play().catch(()=>{})}catch(e){}};
+  addEventListener("pointerdown",unlock,true)}
 let AC=null;function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}if(AC.state==="suspended")AC.resume().catch(()=>{});return AC}
 function tone(t0,freq,dur,{type="sine",gain=.5,attack=.004,decay=null,detune=0,pan=0,bend=0}={}){const c=ac();if(!c)return;const o=c.createOscillator(),g=c.createGain(),p=c.createStereoPanner?c.createStereoPanner():null;
   o.type=type;o.frequency.setValueAtTime(freq,t0);if(bend)o.frequency.exponentialRampToValueAtTime(Math.max(20,freq*bend),t0+dur);o.detune.value=detune;
